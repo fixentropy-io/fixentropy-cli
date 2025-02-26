@@ -12,9 +12,10 @@
         "check": "biome check --write"
     },
     "devDependencies": {
+        "@biomejs/biome": "^1.9.0",
         "@types/bun": "latest",
         "@types/cli-progress": "^3.11.6",
-        "@biomejs/biome": "^1.9.0"
+        "@types/promptly": "^3.0.5"
     },
     "peerDependencies": {
         "typescript": "^5.5.0"
@@ -26,6 +27,7 @@
         "@dragee-io/report-generator": "https://github.com/dragee-io/dragee-report-generator",
         "@dragee-io/type": "0.0.1",
         "cli-progress": "^3.12.0",
-        "commander": "^12.1.0"
+        "commander": "^12.1.0",
+        "promptly": "^3.2.0"
     }
 }

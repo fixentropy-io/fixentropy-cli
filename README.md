@@ -50,7 +50,7 @@ bun run index.ts clear-registry
 
 ### generate-asserter
 
-From [dragee-asserter-generator](https://github.com/dragee-io/dragee-asserter-generator)  
+From [dragee-asserter-generator](https://github.com/dragee-io/dragee-asserter-generator)
 To generate a new dragee asserter
 
 ```bash
@@ -65,7 +65,7 @@ bun run index.ts generate-asserter --name zzz --output-dir E:\Projets\Dragee.io
 
 ### generate-grapher
 
-From [dragee-grapher-generator](https://github.com/dragee-io/dragee-grapher-generator)  
+From [dragee-grapher-generator](https://github.com/dragee-io/dragee-grapher-generator)
 To generate a new dragee grapher
 
 ```bash
