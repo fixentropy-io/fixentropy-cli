@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const MAX_EMAIL_RETRIES = 2;
-const CONFIG_FILE_PATH = path.resolve(__dirname, '../emailOptin.config.json');
+export const EMAIL_OPTIN_CONFIG_FILE_PATH = path.resolve(__dirname, '../emailOptin.config.json');
 
 type OptinChoicePolicy = {
     email: string;
@@ -46,7 +46,7 @@ const askForEmail = async (currentNumberOfTries: number): Promise<string | undef
     }
 };
 
-const storeEmailRemote = async (email: string) => {
+export const storeEmailRemotely = async (email: string) => {
     try {
         return await fetch('https://dragee-serverless-functions.vercel.app/api/newsletter', {
             method: 'POST',
@@ -68,11 +68,11 @@ const storeEmailOptinChoice = async ({
     optinChoice
 }: OptinChoicePolicy) => {
     try {
-        const config = JSON.parse(fs.readFileSync(CONFIG_FILE_PATH, 'utf-8'));
+        const config = JSON.parse(fs.readFileSync(EMAIL_OPTIN_CONFIG_FILE_PATH, 'utf-8'));
         if (email) {
             config.email = email;
             console.log('here and…');
-            const res = await storeEmailRemote(email);
+            const res = await storeEmailRemotely(email);
             console.log('…there');
             if (!res?.ok) {
                 const body = await res?.json();
@@ -81,25 +81,30 @@ const storeEmailOptinChoice = async ({
         }
         config.optinChoice = optinChoice;
         config.choiceHasBeenMade = choiceHasBeenMade;
-        fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify(config, null, 2));
+        fs.writeFileSync(EMAIL_OPTIN_CONFIG_FILE_PATH, JSON.stringify(config, null, 2));
     } catch (error) {
         console.error('Failed to save email to config file:', error);
     }
 };
 
 const checkConfigFile = async () => {
-    if (!fs.existsSync(CONFIG_FILE_PATH)) {
+    if (!fs.existsSync(EMAIL_OPTIN_CONFIG_FILE_PATH)) {
         try {
-            fs.writeFileSync(CONFIG_FILE_PATH, JSON.stringify(DEFAULT_OPTIN_CHOICE, null, 2));
+            fs.writeFileSync(
+                EMAIL_OPTIN_CONFIG_FILE_PATH,
+                JSON.stringify(DEFAULT_OPTIN_CHOICE, null, 2)
+            );
         } catch (error) {
             console.error('Failed to get optin config file', error);
         }
     }
 };
 
-const getOptinChoiceHasBeenMade = (): boolean | undefined => {
+const getIfOptinChoiceHasBeenMade = (): boolean | undefined => {
     try {
-        const config = JSON.parse(fs.readFileSync(CONFIG_FILE_PATH, 'utf-8')) as OptinChoicePolicy;
+        const config = JSON.parse(
+            fs.readFileSync(EMAIL_OPTIN_CONFIG_FILE_PATH, 'utf-8')
+        ) as OptinChoicePolicy;
         return config.choiceHasBeenMade;
     } catch (error) {
         console.error('Failed to read config file:', error);
@@ -145,7 +150,7 @@ const askForUserOptinPolicy = async () => {
 
 export const getUpdatesByEmailHandler = async (args?: GetUpdatesByEmailHandlerArgs) => {
     await checkConfigFile();
-    const optinChoiceHasBeenMade = await getOptinChoiceHasBeenMade();
+    const optinChoiceHasBeenMade = await getIfOptinChoiceHasBeenMade();
 
     if (optinChoiceHasBeenMade && !args?.askAgain) {
         return;
