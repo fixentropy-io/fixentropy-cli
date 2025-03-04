@@ -1,9 +1,9 @@
 import promptly from 'promptly';
 import fs from 'node:fs';
-import path from 'node:path';
+import { config } from '../cli.config';
 
 const MAX_EMAIL_RETRIES = 2;
-export const EMAIL_OPTIN_CONFIG_FILE_PATH = path.resolve(__dirname, '../emailOptin.config.json');
+const EMAIL_OPTIN_CONFIG_FILE_PATH = config.emailOptinConfigFile;
 
 type OptinChoicePolicy = {
     email: string;
@@ -47,6 +47,9 @@ const askForEmail = async (currentNumberOfTries: number): Promise<string | undef
 };
 
 export const storeEmailRemotely = async (email: string) => {
+    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+        return { ok: true, json: () => '', status: 200 };
+    }
     try {
         return await fetch('https://dragee-serverless-functions.vercel.app/api/newsletter', {
             method: 'POST',
@@ -71,9 +74,7 @@ const storeEmailOptinChoice = async ({
         const config = JSON.parse(fs.readFileSync(EMAIL_OPTIN_CONFIG_FILE_PATH, 'utf-8'));
         if (email) {
             config.email = email;
-            console.log('here and…');
             const res = await storeEmailRemotely(email);
-            console.log('…there');
             if (!res?.ok) {
                 const body = await res?.json();
                 throw new Error(`${res?.status}, ${body}`);
@@ -87,7 +88,7 @@ const storeEmailOptinChoice = async ({
     }
 };
 
-const checkConfigFile = async () => {
+export const checkConfigFile = () => {
     if (!fs.existsSync(EMAIL_OPTIN_CONFIG_FILE_PATH)) {
         try {
             fs.writeFileSync(
@@ -100,8 +101,9 @@ const checkConfigFile = async () => {
     }
 };
 
-const getIfOptinChoiceHasBeenMade = (): boolean | undefined => {
+export const getIfOptinChoiceHasBeenMade = (): boolean | undefined => {
     try {
+        checkConfigFile();
         const config = JSON.parse(
             fs.readFileSync(EMAIL_OPTIN_CONFIG_FILE_PATH, 'utf-8')
         ) as OptinChoicePolicy;
@@ -149,7 +151,6 @@ const askForUserOptinPolicy = async () => {
 };
 
 export const getUpdatesByEmailHandler = async (args?: GetUpdatesByEmailHandlerArgs) => {
-    await checkConfigFile();
     const optinChoiceHasBeenMade = await getIfOptinChoiceHasBeenMade();
 
     if (optinChoiceHasBeenMade && !args?.askAgain) {

@@ -3,8 +3,9 @@ import { unlinkSync } from 'node:fs';
 import fs from 'node:fs';
 import * as getUpdatesByEmailHandler from '../src/commands/get-updates-by-email.handler';
 import promptly from 'promptly';
+import { config } from '../src/cli.config';
 
-const EMAIL_OPTIN_CONFIG_FILE_PATH = getUpdatesByEmailHandler.EMAIL_OPTIN_CONFIG_FILE_PATH;
+const EMAIL_OPTIN_CONFIG_FILE_PATH = config.emailOptinConfigFile;
 
 const originalConsole = console;
 
