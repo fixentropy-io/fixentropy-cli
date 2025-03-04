@@ -1,20 +1,25 @@
-import { afterEach, describe, expect, spyOn, test } from 'bun:test';
-import { unlinkSync } from 'node:fs';
 import {
     HtmlReportBuilder,
     JsonReportBuilder,
     MarkdownReportBuilder
 } from '@dragee-io/report-generator';
 import type { Report } from '@dragee-io/type/asserter';
+import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
+import { existsSync, unlinkSync } from 'node:fs';
+import * as getUpdatesEmailHandler from '../src/commands/get-updates-by-email.handler.ts';
+import * as reportCommanderHandler from '../src/commands/report-command.handler.ts';
+import * as reportCommandhandler from '../src/commands/report-command.handler.ts';
 import { buildReports } from '../src/commands/report-command.handler.ts';
 
 const testResultFile = 'test/result';
 
 afterEach(() => {
-    // Delete test files
-    unlinkSync(`${testResultFile}.json`);
-    unlinkSync(`${testResultFile}.html`);
-    unlinkSync(`${testResultFile}.md`);
+    if (existsSync(testResultFile)) {
+        // Delete test files
+        unlinkSync(`${testResultFile}.json`);
+        unlinkSync(`${testResultFile}.html`);
+        unlinkSync(`${testResultFile}.md`);
+    }
 });
 
 describe('Should display correct reporting format', () => {
@@ -70,5 +75,53 @@ describe('Should display correct reporting format', () => {
         expect(htmlReportBuilderMock).toBeCalledWith(reports, testResultFile);
         expect(markdownReportBuilderMock).toBeCalled();
         expect(markdownReportBuilderMock).toBeCalledWith(reports, testResultFile);
+    });
+});
+
+describe('Given a user running the command for the first time', () => {
+    test("it should ask him to get project's updates", async () => {
+        const getUpdatesByEmailHandlerMock = spyOn(
+            getUpdatesEmailHandler,
+            'getIfOptinChoiceHasBeenMade'
+        ).mockReturnValueOnce(false);
+        const askForEmailMock = spyOn(getUpdatesEmailHandler, 'getUpdatesByEmailHandler');
+
+        const reportCommanderHandlerMock = spyOn(
+            reportCommanderHandler,
+            'buildReports'
+        ).mockImplementation(() => {});
+
+        await reportCommandhandler.reportCommandhandler({ fromDir: '', toDir: '' });
+
+        expect(askForEmailMock).toHaveBeenCalledTimes(1);
+
+        getUpdatesByEmailHandlerMock.mockClear();
+        reportCommanderHandlerMock.mockClear();
+        askForEmailMock.mockClear();
+    });
+});
+
+describe('Given a user not running the command for the first time', () => {
+    beforeEach(() => {
+        getUpdatesEmailHandler.checkConfigFile();
+    });
+
+    test("it should not ask him to get project's updates", async () => {
+        const getUpdatesByEmailHandlerMock = spyOn(
+            getUpdatesEmailHandler,
+            'getIfOptinChoiceHasBeenMade'
+        ).mockReturnValueOnce(true);
+        const reportCommanderHandlerMock = spyOn(
+            reportCommanderHandler,
+            'buildReports'
+        ).mockImplementation(() => {});
+        const askForEmailMock = spyOn(getUpdatesEmailHandler, 'getUpdatesByEmailHandler');
+
+        await reportCommandhandler.reportCommandhandler({ fromDir: '', toDir: '' });
+        expect(askForEmailMock).not.toHaveBeenCalled();
+
+        getUpdatesByEmailHandlerMock.mockClear();
+        askForEmailMock.mockClear();
+        reportCommanderHandlerMock.mockClear();
     });
 });
