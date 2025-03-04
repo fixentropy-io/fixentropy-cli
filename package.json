@@ -5,7 +5,7 @@
     "version": "0.0.1",
     "scripts": {
         "exec": "bun run index.ts",
-        "exec-local": "env DRAGEE_ASSERTER_LOCAL_REGISTRY_PATH=./test/approval/fake-asserters/ bun exec run --from-dir ./test/approval/sample",
+        "exec-local": "env NODE_ENV='development' env DRAGEE_ASSERTER_LOCAL_REGISTRY_PATH=./test/approval/fake-asserters/ bun exec run --from-dir ./test/approval/sample",
         "build": "bun build index.ts --target bun --compile --outfile dist/dragee-cli",
         "format": "biome format --write",
         "lint": "biome lint --write",
