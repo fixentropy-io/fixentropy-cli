@@ -19,7 +19,6 @@ type Options = {
 };
 
 export const reportCommandhandler = async ({ fromDir, toDir }: Options) => {
-    console.info('🧋', process.env.NODE_ENV);
     const dragees = await lookupForDragees(fromDir);
     const namespaces = await lookupForNamespaces(dragees);
     const asserters: Asserter[] = await lookupForProjects(
