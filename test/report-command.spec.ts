@@ -6,7 +6,7 @@ import {
 import type { Report } from '@dragee-io/type/asserter';
 import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
 import { existsSync, unlinkSync } from 'node:fs';
-import * as getUpdatesEmailHandler from '../src/commands/get-updates-by-email.handler.ts';
+import * as newsletterSubscriptionHandler from '../src/commands/newsletter-subscription.handler.ts';
 import * as reportCommanderHandler from '../src/commands/report-command.handler.ts';
 import * as reportCommandhandler from '../src/commands/report-command.handler.ts';
 import { buildReports } from '../src/commands/report-command.handler.ts';
@@ -81,10 +81,13 @@ describe('Should display correct reporting format', () => {
 describe('Given a user running the command for the first time', () => {
     test("it should ask him to get project's updates", async () => {
         const getUpdatesByEmailHandlerMock = spyOn(
-            getUpdatesEmailHandler,
+            newsletterSubscriptionHandler,
             'getIfOptinChoiceHasBeenMade'
         ).mockReturnValueOnce(false);
-        const askForEmailMock = spyOn(getUpdatesEmailHandler, 'getUpdatesByEmailHandler');
+        const askForEmailMock = spyOn(
+            newsletterSubscriptionHandler,
+            'subscribeToNewsletterHandler'
+        );
 
         const reportCommanderHandlerMock = spyOn(
             reportCommanderHandler,
@@ -103,19 +106,22 @@ describe('Given a user running the command for the first time', () => {
 
 describe('Given a user not running the command for the first time', () => {
     beforeEach(() => {
-        getUpdatesEmailHandler.checkConfigFile();
+        newsletterSubscriptionHandler.checkConfigFile();
     });
 
     test("it should not ask him to get project's updates", async () => {
         const getUpdatesByEmailHandlerMock = spyOn(
-            getUpdatesEmailHandler,
+            newsletterSubscriptionHandler,
             'getIfOptinChoiceHasBeenMade'
         ).mockReturnValueOnce(true);
         const reportCommanderHandlerMock = spyOn(
             reportCommanderHandler,
             'buildReports'
         ).mockImplementation(() => {});
-        const askForEmailMock = spyOn(getUpdatesEmailHandler, 'getUpdatesByEmailHandler');
+        const askForEmailMock = spyOn(
+            newsletterSubscriptionHandler,
+            'subscribeToNewsletterHandler'
+        );
 
         await reportCommandhandler.reportCommandhandler({ fromDir: '', toDir: '' });
         expect(askForEmailMock).not.toHaveBeenCalled();

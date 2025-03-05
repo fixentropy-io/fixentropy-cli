@@ -150,14 +150,18 @@ const askForUserOptinPolicy = async () => {
     }
 };
 
-export const getUpdatesByEmailHandler = async (args?: GetUpdatesByEmailHandlerArgs) => {
+export const subscribeToNewsletterHandler = async (args?: GetUpdatesByEmailHandlerArgs) => {
     const optinChoiceHasBeenMade = await getIfOptinChoiceHasBeenMade();
 
-    if (optinChoiceHasBeenMade && !args?.askAgain) {
+    const shouldNotAskAgainUser = optinChoiceHasBeenMade && !args?.askAgain;
+
+    if (shouldNotAskAgainUser) {
         return;
     }
 
     try {
         await askForUserOptinPolicy();
-    } catch (error) {}
+    } catch (error) {
+        // handle process force quit
+    }
 };

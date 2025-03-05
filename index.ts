@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import { clearRegistryHandler } from './src/commands/clear-registry-command.handler.ts';
 import { drawCommandhandler } from './src/commands/draw-command.handler.ts';
 import { reportCommandhandler } from './src/commands/report-command.handler.ts';
-import { getUpdatesByEmailHandler } from './src/commands/get-updates-by-email.handler.ts';
+import { subscribeToNewsletterHandler } from './src/commands/newsletter-subscription.handler.ts';
 
 const report = new Command('report')
     .alias('r')
@@ -50,9 +50,9 @@ const clearRegistry = new Command('clear-registry')
     )
     .action(clearRegistryHandler);
 
-const getUpdatesByEmail = new Command('get-updates')
-    .summary('get updated when new features are available')
-    .action(() => getUpdatesByEmailHandler({ askAgain: true }));
+const newsletterSubscription = new Command('newsletter')
+    .summary('get updated by email when new features are available')
+    .action(() => subscribeToNewsletterHandler({ askAgain: true }));
 
 new Command()
     .addCommand(generateAsserter)
@@ -60,7 +60,7 @@ new Command()
     .addCommand(report)
     .addCommand(draw)
     .addCommand(clearRegistry)
-    .addCommand(getUpdatesByEmail)
+    .addCommand(newsletterSubscription)
     .showHelpAfterError()
     .showSuggestionAfterError()
     .parse(process.argv);

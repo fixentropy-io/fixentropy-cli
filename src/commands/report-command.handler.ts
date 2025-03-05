@@ -10,8 +10,8 @@ import { lookupForDragees } from '../dragee-lookup.ts';
 import { lookupForNamespaces } from '../namespace-lookup.ts';
 import {
     getIfOptinChoiceHasBeenMade,
-    getUpdatesByEmailHandler
-} from './get-updates-by-email.handler.ts';
+    subscribeToNewsletterHandler
+} from './newsletter-subscription.handler.ts';
 
 type Options = {
     fromDir: string;
@@ -41,7 +41,7 @@ const askForUpdatesByEmail = () => {
     const optinChoiceHasAlreadyBeenMade = getIfOptinChoiceHasBeenMade();
 
     if (!optinChoiceHasAlreadyBeenMade) {
-        getUpdatesByEmailHandler();
+        subscribeToNewsletterHandler();
     }
 };
 

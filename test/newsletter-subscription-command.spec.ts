@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, spyOn, test, mock, jest, beforeEach } from 'bun:test';
 import { unlinkSync } from 'node:fs';
 import fs from 'node:fs';
-import * as getUpdatesByEmailHandler from '../src/commands/get-updates-by-email.handler';
+import * as getUpdatesByEmailHandler from '../src/commands/newsletter-subscription.handler';
 import promptly from 'promptly';
 import { config } from '../src/cli.config';
 
@@ -37,7 +37,7 @@ describe('Given the user opted in to updates by email, it should', () => {
             ok: true
         } as unknown as Awaited<ReturnType<typeof getUpdatesByEmailHandler.storeEmailRemotely>>);
 
-        await getUpdatesByEmailHandler.getUpdatesByEmailHandler();
+        await getUpdatesByEmailHandler.subscribeToNewsletterHandler();
         const emailOptinConfig = await Bun.file(EMAIL_OPTIN_CONFIG_FILE_PATH).json();
 
         expect(emailOptinConfig.email).toBe(TEST_EMAIL);
@@ -54,7 +54,7 @@ describe('Given the user opted in to updates by email, it should', () => {
             storeEmailRemotelyMock
         );
 
-        await getUpdatesByEmailHandler.getUpdatesByEmailHandler();
+        await getUpdatesByEmailHandler.subscribeToNewsletterHandler();
 
         expect(storeEmailRemotelyMock).toHaveBeenNthCalledWith(1, TEST_EMAIL);
     });
@@ -67,7 +67,7 @@ describe('Given the user opted out to updates by email, it should', () => {
             ok: true
         } as unknown as Awaited<ReturnType<typeof getUpdatesByEmailHandler.storeEmailRemotely>>);
 
-        await getUpdatesByEmailHandler.getUpdatesByEmailHandler();
+        await getUpdatesByEmailHandler.subscribeToNewsletterHandler();
         const emailOptinConfig = await Bun.file(EMAIL_OPTIN_CONFIG_FILE_PATH).json();
 
         expect(emailOptinConfig.email).toBe('');
@@ -83,7 +83,7 @@ describe('Given the user opted out to updates by email, it should', () => {
             storeEmailRemotelyMock
         );
 
-        await getUpdatesByEmailHandler.getUpdatesByEmailHandler();
+        await getUpdatesByEmailHandler.subscribeToNewsletterHandler();
 
         expect(storeEmailRemotelyMock).not.toHaveBeenCalled();
     });
