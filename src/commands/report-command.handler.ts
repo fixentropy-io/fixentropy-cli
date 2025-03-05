@@ -8,6 +8,10 @@ import { type Asserter, type Report, asserterHandler } from '@dragee-io/type/ass
 import { config } from '../cli.config.ts';
 import { lookupForDragees } from '../dragee-lookup.ts';
 import { lookupForNamespaces } from '../namespace-lookup.ts';
+import {
+    getIfOptinChoiceHasBeenMade,
+    subscribeToNewsletterHandler
+} from './newsletter-subscription.handler.ts';
 
 type Options = {
     fromDir: string;
@@ -30,6 +34,15 @@ export const reportCommandhandler = async ({ fromDir, toDir }: Options) => {
     }
 
     buildReports(reports, `${toDir}/result`);
+    askForUpdatesByEmail();
+};
+
+const askForUpdatesByEmail = () => {
+    const optinChoiceHasAlreadyBeenMade = getIfOptinChoiceHasBeenMade();
+
+    if (!optinChoiceHasAlreadyBeenMade) {
+        subscribeToNewsletterHandler();
+    }
 };
 
 export const buildReports = (reports: Report[], filePath: string) => {

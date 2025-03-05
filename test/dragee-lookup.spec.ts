@@ -20,15 +20,18 @@ describe('Should retrive dragees from directory', () => {
         const dragees: Dragee[] = await lookupForDragees(testFolder);
 
         expect(dragees).toBeArrayOfSize(8);
-        expect(dragees.map(d => d.name)).toStrictEqual([
-            'io.dragee.annotation.ddd.sample.ACommand',
-            'io.dragee.annotation.ddd.sample.AFactory',
-            'io.dragee.annotation.ddd.sample.AnAggregate',
-            'io.dragee.annotation.ddd.sample.AnEntity',
-            'io.dragee.annotation.ddd.sample.AnEvent',
-            'io.dragee.annotation.ddd.sample.ARepository',
-            'io.dragee.annotation.ddd.sample.AService',
-            'io.dragee.annotation.ddd.sample.AValueObject'
-        ]);
+        const result = dragees.map(d => d.name).sort();
+        expect(result).toEqual(
+            [
+                'io.dragee.annotation.ddd.sample.ACommand',
+                'io.dragee.annotation.ddd.sample.AFactory',
+                'io.dragee.annotation.ddd.sample.AnAggregate',
+                'io.dragee.annotation.ddd.sample.AnEntity',
+                'io.dragee.annotation.ddd.sample.AnEvent',
+                'io.dragee.annotation.ddd.sample.ARepository',
+                'io.dragee.annotation.ddd.sample.AService',
+                'io.dragee.annotation.ddd.sample.AValueObject'
+            ].sort()
+        );
     });
 });

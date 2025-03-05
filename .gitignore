@@ -10,7 +10,7 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# Caches 
+# Caches
 
 .cache
 
@@ -176,3 +176,6 @@ dist
 
 # Bun compile files
 *.bun-build
+
+# email optin choice
+emailOptin.config.json
