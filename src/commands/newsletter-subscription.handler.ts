@@ -60,9 +60,7 @@ export const storeEmailRemotely = async (email: string) => {
                 email
             })
         });
-    } catch (error) {
-        console.error('erroooor', error);
-    }
+    } catch (error) {}
 };
 
 const storeEmailOptinChoice = async ({
@@ -129,24 +127,24 @@ const askForUserOptinPolicy = async () => {
         });
 
         console.info('No worries! In case you change your mind, check our website');
-    } else {
-        try {
-            const userEmail = await askForEmail(1);
-            if (userEmail) {
-                await storeEmailOptinChoice({
-                    choiceHasBeenMade: true,
-                    email: userEmail,
-                    optinChoice: true
-                });
+        return;
+    }
+    try {
+        const userEmail = await askForEmail(1);
+        if (userEmail) {
+            await storeEmailOptinChoice({
+                choiceHasBeenMade: true,
+                email: userEmail,
+                optinChoice: true
+            });
 
-                console.log(
-                    `
+            console.log(
+                `
                 Thanks ${userEmail} 💌! We'll keep you updated on new features and updates.`
-                );
-            }
-        } catch (error) {
-            console.error('We are sorry, but we could not process your email.');
+            );
         }
+    } catch (error) {
+        console.error('We are sorry, but we could not process your email.');
     }
 };
 
