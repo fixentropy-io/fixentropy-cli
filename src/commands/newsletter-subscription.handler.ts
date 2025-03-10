@@ -47,7 +47,7 @@ const askForEmail = async (currentNumberOfTries: number): Promise<string | undef
 };
 
 export const storeEmailRemotely = async (email: string) => {
-    if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+    if (process.env.IS_DEV || process.env.NODE_ENV === 'test') {
         return { ok: true, json: () => '', status: 200 };
     }
     try {

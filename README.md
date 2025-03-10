@@ -6,6 +6,12 @@ To install dependencies:
 bun install
 ```
 
+To set dev environment variables:
+
+```bash
+cp .env.example .env
+```
+
 To run:
 
 ```bash
@@ -76,6 +82,14 @@ Example
 
 ```bash
 bun run index.ts generate-grapher --name zzz --output-dir E:\Projets\Dragee.io
+```
+
+### newsletter
+
+To get updates from the project by email
+
+```bash
+bun run index.ts newsletter
 ```
 
 This project was created using `bun init` in bun v1.0.22. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
