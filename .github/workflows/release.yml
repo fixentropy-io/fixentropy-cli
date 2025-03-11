@@ -1,0 +1,50 @@
+# This workflow will build binaries using bun and then create a release and then add binaries artifacts to the release when a tag is pushed
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+name: Release binaries
+
+on:
+  push:
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build-release:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "latest"
+      - run: bun install
+      # - run: bun test
+      - name: build
+        run: bun run build:release
+      - name: Zip binary
+        run: |
+          zip dist/dragee-linux.zip dist/dragee-linux
+          zip dist/dragee-macos-arm64.zip dist/dragee-macos-arm64
+          zip dist/dragee-macos-x64.zip dist/dragee-macos-x64
+          zip dist/dragee-windowszip dist/dragee-windows.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          path: ./dist/*
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/dragee-linux.zip
+            dist/dragee-macos-arm64.zip
+            dist/dragee-macos-x64.zip
+            dist/dragee-windows.zip
+          draft: false
+          prerelease: true
+          body: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          tag_name: ${{ github.ref }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
