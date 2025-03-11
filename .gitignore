@@ -179,3 +179,6 @@ dist
 
 # email optin choice
 emailOptin.config.json
+
+# bash test framework `bats`
+test/bats
