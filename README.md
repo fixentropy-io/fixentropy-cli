@@ -1,5 +1,28 @@
 # dragee-cli
 
+## Usage
+
+1. Download the appropriate binary from [the release](https://github.com/dragee-io/dragee-cli/releases)
+2. Add the binary to your `$PATH`
+
+### MacOS installation
+
+The `dragee` macos binary is unsigned. To use it, [remove the quarantine](https://support.apple.com/en-us/102445) on the file:
+
+with command line:
+```bash
+chmod +x ~/Downalods/dragee-mac-os
+xattr -d com.apple.metadata:kMDItemWhereFroms ~/Downalods/dragee-macos-arm64
+xattr -d com.apple.quarantine ~/Downalods/dragee-macos-arm64
+```
+
+from MacOs Security settings (after having launched the binary):
+
+![1741772291168](assets/README/disable-security-on-unsigned-macos-binary.png)
+
+([Apple documentation](https://support.apple.com/en-us/102445))
+## Development
+
 To install dependencies:
 
 ```bash
@@ -17,6 +40,8 @@ To run:
 ```bash
 bun run index.ts
 ```
+
+## Commands
 
 ### report
 
