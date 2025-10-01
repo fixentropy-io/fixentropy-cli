@@ -15,5 +15,5 @@ export const config: Config = {
     localRegistryPath:
         process.env.DRAGEE_ASSERTER_LOCAL_REGISTRY_PATH ?? path.join(rootPath, 'registry'),
     projectsRegistryUrl: 'https://registry.npmjs.org/@dragee-io',
-    emailOptinConfigFile: path.resolve(__dirname, './emailOptin.config.json')
+    emailOptinConfigFile: path.resolve(rootPath, './emailOptin.config.json'),
 };
