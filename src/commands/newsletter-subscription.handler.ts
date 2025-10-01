@@ -1,5 +1,6 @@
 import promptly from 'promptly';
 import fs from 'node:fs';
+import path from 'node:path';
 import { config } from '../cli.config';
 
 const MAX_EMAIL_RETRIES = 2;
@@ -69,6 +70,7 @@ const storeEmailOptinChoice = async ({
     optinChoice
 }: OptinChoicePolicy) => {
     try {
+        checkConfigFile();
         const config = JSON.parse(fs.readFileSync(EMAIL_OPTIN_CONFIG_FILE_PATH, 'utf-8'));
         if (email) {
             config.email = email;
@@ -89,6 +91,10 @@ const storeEmailOptinChoice = async ({
 export const checkConfigFile = () => {
     if (!fs.existsSync(EMAIL_OPTIN_CONFIG_FILE_PATH)) {
         try {
+            const dir = path.dirname(EMAIL_OPTIN_CONFIG_FILE_PATH);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
             fs.writeFileSync(
                 EMAIL_OPTIN_CONFIG_FILE_PATH,
                 JSON.stringify(DEFAULT_OPTIN_CHOICE, null, 2)
