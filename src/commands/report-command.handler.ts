@@ -30,14 +30,17 @@ export const reportCommandhandler = async ({ fromDir, toDir }: Options) => {
     if (!process.env.OIDC_TOKEN) {
         return console.error('OIDC_TOKEN env variable is not set');
     }
-    const { token } = await startScan(process.env.OIDC_TOKEN);
+    console.log("OIDC_TOKEN: ", process.env.OIDC_TOKEN);
+    const result = await startScan(process.env.OIDC_TOKEN);
+    console.log("startScan: ", result);
 
     for (const asserter of asserters) {
         console.log(`Running asserter for namespace ${asserter.namespace}`);
         reports.push(asserterHandler(asserter, dragees));
     }
 
-    await publishReports(token, reports);
+    const resultpublish = await publishReports(result.token, reports);
+    console.log("publishReports: ", resultpublish);
     buildReports(reports, `${toDir}/result`);
     askForUpdatesByEmail();
 };
