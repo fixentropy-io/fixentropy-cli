@@ -27,12 +27,17 @@ export const reportCommandhandler = async ({ fromDir, toDir }: Options) => {
         namespaces.map(n => `${n}-asserter`)
     );
     const reports: Report[] = [];
+    if (!process.env.OIDC_TOKEN) {
+        return console.error('OIDC_TOKEN env variable is not set');
+    }
+    const { token } = await startScan(process.env.OIDC_TOKEN);
 
     for (const asserter of asserters) {
         console.log(`Running asserter for namespace ${asserter.namespace}`);
         reports.push(asserterHandler(asserter, dragees));
     }
 
+    await publishReports(token, reports);
     buildReports(reports, `${toDir}/result`);
     askForUpdatesByEmail();
 };
@@ -50,3 +55,35 @@ export const buildReports = (reports: Report[], filePath: string) => {
     HtmlReportBuilder.buildReports(reports, filePath);
     MarkdownReportBuilder.buildReports(reports, filePath);
 };
+
+type startScanDTO = {
+    scanId: string,
+    token: string,
+    projectId: string,
+    branchName: string,
+    repo: string,
+    commitSha: string,
+    expiresAt: string,
+}
+
+export const publishReports = async (scanCredit: string, reports: Report[]) => {
+    const result = await fetch(`${process.env.BACKEND_URL}/scan/report`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({scanCredit, reports})
+    })
+    return result.json();
+};
+
+export const startScan = async (oidcToken: string): Promise<startScanDTO> => {
+    const result = await fetch(`${process.env.BACKEND_URL}/scan/start`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({oidcToken})
+    })
+    return result.json() as Promise<startScanDTO>;
+}
