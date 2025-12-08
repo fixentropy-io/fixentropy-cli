@@ -32,7 +32,7 @@ export const reportCommandhandler = async ({ fromDir, toDir }: Options) => {
     }
     console.log("OIDC_TOKEN: ", process.env.OIDC_TOKEN);
     const result = await startScan(process.env.OIDC_TOKEN);
-    console.log("startScan: ", result);
+    console.log("startScan: ", result.token);
 
     for (const asserter of asserters) {
         console.log(`Running asserter for namespace ${asserter.namespace}`);
@@ -69,13 +69,13 @@ type startScanDTO = {
     expiresAt: string,
 }
 
-export const publishReports = async (scanCredit: string, reports: Report[]) => {
+export const publishReports = async (scanCreditId: string, reports: Report[]) => {
     const result = await fetch(`${process.env.BACKEND_URL}/scan/report`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({scanCredit, reports})
+        body: JSON.stringify({scanCreditId, reports})
     })
     return result.json();
 };
