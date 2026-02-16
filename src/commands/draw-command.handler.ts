@@ -1,6 +1,6 @@
 import { lookupForProjects } from '@dragee-io/package-installer';
-import type { Dragee } from '@dragee-io/type/common';
-import type { Grapher } from '@dragee-io/type/grapher';
+import type { Dragee } from '@fixentropy-io/type/common';
+import type { Grapher } from '@fixentropy-io/type/grapher';
 import { config } from '../cli.config.ts';
 import { lookupForDragees } from '../dragee-lookup';
 import { lookupForNamespaces } from '../namespace-lookup.ts';

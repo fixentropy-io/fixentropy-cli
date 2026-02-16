@@ -1,7 +1,7 @@
 import { afterAll, afterEach, describe, expect, test } from 'bun:test';
 import { rmdirSync, unlinkSync } from 'node:fs';
-import type { Dragee } from '@dragee-io/type/common';
-import type { Grapher } from '@dragee-io/type/grapher';
+import type { Dragee } from '@fixentropy-io/type/common';
+import type { Grapher } from '@fixentropy-io/type/grapher';
 import { grapherHandler } from '../src/commands/draw-command.handler.ts';
 
 const testResultDir = 'test/draw-command-test-result/';

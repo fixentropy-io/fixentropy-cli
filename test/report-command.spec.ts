@@ -3,7 +3,7 @@ import {
     JsonReportBuilder,
     MarkdownReportBuilder
 } from '@dragee-io/report-generator';
-import type { Report } from '@dragee-io/type/asserter';
+import type { Report } from '@fixentropy-io/type/asserter';
 import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
 import { existsSync, unlinkSync } from 'node:fs';
 import * as newsletterSubscriptionHandler from '../src/commands/newsletter-subscription.handler.ts';

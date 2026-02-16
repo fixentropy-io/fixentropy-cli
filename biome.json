@@ -1,4 +1,4 @@
 {
     "$schema": "https://biomejs.dev/schemas/1.9.3/schema.json",
-    "extends": ["./node_modules/@dragee-io/type/biome.json"]
+    "extends": ["./node_modules/@fixentropy-io/type/biome.json"]
 }
