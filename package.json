@@ -1,21 +1,21 @@
 {
-  "name": "dragee-cli",
+  "name": "fixentropy-cli",
   "module": "index.ts",
   "type": "module",
   "version": "0.0.1",
   "bin": {
-    "dragee": "./dist/cli.sh"
+    "fixentropy": "./dist/cli.sh"
   },
   "scripts": {
     "exec": "bun run index.ts",
     "exec-local": "env NODE_ENV='development' env DRAGEE_ASSERTER_LOCAL_REGISTRY_PATH=./test/approval/fake-asserters/ bun exec run --from-dir ./test/approval/sample",
-    "build": "bun build index.ts --target bun --compile --outfile dist/dragee-cli",
+    "build": "bun build index.ts --target bun --compile --outfile dist/fixentropy-cli",
     "build:release": "bun run build:all && cp src/cli.sh dist/cli.sh",
     "build:all": "bun run build:linux && bun run build:windows && bun run build:macos-intel && bun run build:macos-silicon",
-    "build:linux": "bun build --compile --target=bun-linux-x64 index.ts --outfile dist/dragee-linux",
-    "build:windows": "bun build --compile --target=bun-windows-x64-v1.1.4 index.ts --outfile dist/dragee-windows",
-    "build:macos-intel": "bun build --compile --target=bun-darwin-x64 index.ts --outfile dist/dragee-macos-x64",
-    "build:macos-silicon": "bun build --compile --target=bun-darwin-arm64 index.ts --outfile dist/dragee-macos-arm64",
+    "build:linux": "bun build --compile --target=bun-linux-x64 index.ts --outfile dist/fixentropy-linux",
+    "build:windows": "bun build --compile --target=bun-windows-x64-v1.1.4 index.ts --outfile dist/fixentropy-windows",
+    "build:macos-intel": "bun build --compile --target=bun-darwin-x64 index.ts --outfile dist/fixentropy-macos-x64",
+    "build:macos-silicon": "bun build --compile --target=bun-darwin-arm64 index.ts --outfile dist/fixentropy-macos-arm64",
     "format": "biome format --write",
     "lint": "biome lint --write",
     "check": "biome check --write"
