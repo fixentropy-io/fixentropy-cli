@@ -1,4 +1,4 @@
-import { lookupForProjects } from '@dragee-io/package-installer';
+import { lookupForProjects } from '@fixentropy-io/package-installer';
 import type { Dragee } from '@fixentropy-io/type/common';
 import type { Grapher } from '@fixentropy-io/type/grapher';
 import { config } from '../cli.config.ts';

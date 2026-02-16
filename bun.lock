@@ -5,10 +5,10 @@
     "": {
       "name": "dragee-cli",
       "dependencies": {
-        "@dragee-io/asserter-generator": "https://github.com/fixentropy-io/fixentropy-asserter-generator",
-        "@dragee-io/grapher-generator": "https://github.com/fixentropy-io/fixentropy-grapher-generator",
-        "@dragee-io/package-installer": "https://github.com/fixentropy-io/fixentropy-package-installer",
-        "@dragee-io/report-generator": "https://github.com/fixentropy-io/fixentropy-report-generator",
+        "@fixentropy-io/asserter-generator": "https://github.com/fixentropy-io/fixentropy-asserter-generator",
+        "@fixentropy-io/grapher-generator": "https://github.com/fixentropy-io/fixentropy-grapher-generator",
+        "@fixentropy-io/package-installer": "https://github.com/fixentropy-io/fixentropy-package-installer",
+        "@fixentropy-io/report-generator": "https://github.com/fixentropy-io/fixentropy-report-generator",
         "@fixentropy-io/type": "0.0.4",
         "cli-progress": "^3.12.0",
         "commander": "^12.1.0",
@@ -47,15 +47,15 @@
 
     "@biomejs/cli-win32-x64": ["@biomejs/cli-win32-x64@1.9.4", "", { "os": "win32", "cpu": "x64" }, "sha512-8Y5wMhVIPaWe6jw2H+KlEm4wP/f7EW3810ZLmDlrEEy5KvBsb9ECEfu/kMWD484ijfQ8+nIi0giMgu9g1UAuuA=="],
 
-    "@dragee-io/asserter-generator": ["@dragee-io/asserter-generator@github:fixentropy-io/fixentropy-asserter-generator#75388f2", { "dependencies": { "@dragee-io/type": "https://github.com/dragee-io/dragee-model", "commander": "^12.1.0" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-asserter-generator-75388f2"],
-
-    "@dragee-io/grapher-generator": ["@dragee-io/grapher-generator@github:fixentropy-io/fixentropy-grapher-generator#1eedd89", { "dependencies": { "@dragee-io/type": "https://github.com/dragee-io/dragee-model", "commander": "^12.1.0" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-grapher-generator-1eedd89"],
-
-    "@dragee-io/package-installer": ["@dragee-io/package-installer@github:fixentropy-io/fixentropy-package-installer#1be6af9", { "dependencies": { "@dragee-io/type": "https://github.com/fixentropy-io/fixentropy-model", "axios": "^1.7.7", "tar": "^7.4.3" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-package-installer-1be6af9"],
-
-    "@dragee-io/report-generator": ["@dragee-io/report-generator@github:fixentropy-io/fixentropy-report-generator#5d34e88", { "dependencies": { "@dragee-io/type": "https://github.com/fixentropy-io/fixentropy-model" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-report-generator-5d34e88"],
-
     "@dragee-io/type": ["@fixentropy-io/type@github:dragee-io/dragee-model#2b5b2f5", {}, "fixentropy-io-fixentropy-model-2b5b2f5"],
+
+    "@fixentropy-io/asserter-generator": ["@dragee-io/asserter-generator@github:fixentropy-io/fixentropy-asserter-generator#75388f2", { "dependencies": { "@dragee-io/type": "https://github.com/dragee-io/dragee-model", "commander": "^12.1.0" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-asserter-generator-75388f2"],
+
+    "@fixentropy-io/grapher-generator": ["@dragee-io/grapher-generator@github:fixentropy-io/fixentropy-grapher-generator#1eedd89", { "dependencies": { "@dragee-io/type": "https://github.com/dragee-io/dragee-model", "commander": "^12.1.0" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-grapher-generator-1eedd89"],
+
+    "@fixentropy-io/package-installer": ["@dragee-io/package-installer@github:fixentropy-io/fixentropy-package-installer#1be6af9", { "dependencies": { "@dragee-io/type": "https://github.com/fixentropy-io/fixentropy-model", "axios": "^1.7.7", "tar": "^7.4.3" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-package-installer-1be6af9"],
+
+    "@fixentropy-io/report-generator": ["@dragee-io/report-generator@github:fixentropy-io/fixentropy-report-generator#5d34e88", { "dependencies": { "@dragee-io/type": "https://github.com/fixentropy-io/fixentropy-model" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-report-generator-5d34e88"],
 
     "@fixentropy-io/type": ["@fixentropy-io/type@0.0.4", "", {}, "sha512-hksWwBwQS8KCeDkv7No7pwW3w4L0sF2ZMj2i8FspzPM0Wnx6CfDKGn2m5FjRcS7hTqnL6gwEWyntGq04OwRucA=="],
 
@@ -151,8 +151,8 @@
 
     "yallist": ["yallist@5.0.0", "", {}, "sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw=="],
 
-    "@dragee-io/package-installer/@dragee-io/type": ["@fixentropy-io/type@github:fixentropy-io/fixentropy-model#2b5b2f5", {}, "fixentropy-io-fixentropy-model-2b5b2f5"],
+    "@fixentropy-io/package-installer/@dragee-io/type": ["@fixentropy-io/type@github:fixentropy-io/fixentropy-model#2b5b2f5", {}, "fixentropy-io-fixentropy-model-2b5b2f5"],
 
-    "@dragee-io/report-generator/@dragee-io/type": ["@fixentropy-io/type@github:fixentropy-io/fixentropy-model#2b5b2f5", {}, "fixentropy-io-fixentropy-model-2b5b2f5"],
+    "@fixentropy-io/report-generator/@dragee-io/type": ["@fixentropy-io/type@github:fixentropy-io/fixentropy-model#2b5b2f5", {}, "fixentropy-io-fixentropy-model-2b5b2f5"],
   }
 }

@@ -30,10 +30,10 @@
     "typescript": "^5.5.0"
   },
   "dependencies": {
-    "@dragee-io/asserter-generator": "https://github.com/fixentropy-io/fixentropy-asserter-generator",
-    "@dragee-io/grapher-generator": "https://github.com/fixentropy-io/fixentropy-grapher-generator",
-    "@dragee-io/package-installer": "https://github.com/fixentropy-io/fixentropy-package-installer",
-    "@dragee-io/report-generator": "https://github.com/fixentropy-io/fixentropy-report-generator",
+    "@fixentropy-io/asserter-generator": "https://github.com/fixentropy-io/fixentropy-asserter-generator",
+    "@fixentropy-io/grapher-generator": "https://github.com/fixentropy-io/fixentropy-grapher-generator",
+    "@fixentropy-io/package-installer": "https://github.com/fixentropy-io/fixentropy-package-installer",
+    "@fixentropy-io/report-generator": "https://github.com/fixentropy-io/fixentropy-report-generator",
     "@fixentropy-io/type": "0.0.4",
     "cli-progress": "^3.12.0",
     "commander": "^12.1.0",

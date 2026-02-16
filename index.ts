@@ -1,5 +1,5 @@
-import { generateAsserter } from '@dragee-io/asserter-generator';
-import { generateGrapher } from '@dragee-io/grapher-generator';
+import { generateAsserter } from '@fixentropy-io/asserter-generator';
+import { generateGrapher } from '@fixentropy-io/grapher-generator';
 import { Command } from 'commander';
 import { clearRegistryHandler } from './src/commands/clear-registry-command.handler.ts';
 import { drawCommandhandler } from './src/commands/draw-command.handler.ts';

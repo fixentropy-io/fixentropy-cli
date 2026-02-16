@@ -1,9 +1,9 @@
-import { lookupForProjects } from '@dragee-io/package-installer';
+import { lookupForProjects } from '@fixentropy-io/package-installer';
 import {
     HtmlReportBuilder,
     JsonReportBuilder,
     MarkdownReportBuilder
-} from '@dragee-io/report-generator';
+} from '@fixentropy-io/report-generator';
 import { type Asserter, type Report, asserterHandler } from '@fixentropy-io/type/asserter';
 import { config } from '../cli.config.ts';
 import { lookupForDragees } from '../dragee-lookup.ts';
