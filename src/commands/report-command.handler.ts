@@ -16,9 +16,10 @@ import {
 type Options = {
     fromDir: string;
     toDir: string;
+    publish: boolean;
 };
 
-export const reportCommandhandler = async ({ fromDir, toDir }: Options) => {
+export const reportCommandhandler = async ({ fromDir, toDir, publish }: Options) => {
     const dragees = await lookupForDragees(fromDir);
     const namespaces = await lookupForNamespaces(dragees);
     const asserters: Asserter[] = await lookupForProjects(
@@ -27,20 +28,23 @@ export const reportCommandhandler = async ({ fromDir, toDir }: Options) => {
         namespaces.map(n => `${n}-asserter`)
     );
     const reports: Report[] = [];
-    if (!process.env.OIDC_TOKEN) {
-        return console.error('OIDC_TOKEN env variable is not set');
+    let result: startScanDTO | undefined;
+    if (publish) {
+        if (!process.env.OIDC_TOKEN) {
+            return console.error('OIDC_TOKEN env variable is not set');
+        }
+        result = await startScan(process.env.OIDC_TOKEN);
     }
-    console.log("OIDC_TOKEN: ", process.env.OIDC_TOKEN);
-    const result = await startScan(process.env.OIDC_TOKEN);
-    console.log("startScan: ", result.token);
 
     for (const asserter of asserters) {
         console.log(`Running asserter for namespace ${asserter.namespace}`);
         reports.push(asserterHandler(asserter, dragees));
     }
 
-    const resultpublish = await publishReports(result.token, reports);
-    console.log("publishReports: ", resultpublish);
+    if (publish && result) {
+        const resultpublish = await publishReports(result.token, reports);
+        console.log('publishReports: ', resultpublish);
+    }
     buildReports(reports, `${toDir}/result`);
     askForUpdatesByEmail();
 };
@@ -60,33 +64,33 @@ export const buildReports = (reports: Report[], filePath: string) => {
 };
 
 type startScanDTO = {
-    scanId: string,
-    token: string,
-    projectId: string,
-    branchName: string,
-    repo: string,
-    commitSha: string,
-    expiresAt: string,
-}
+    scanId: string;
+    token: string;
+    projectId: string;
+    branchName: string;
+    repo: string;
+    commitSha: string;
+    expiresAt: string;
+};
 
 export const publishReports = async (scanCreditId: string, reports: Report[]) => {
     const result = await fetch(`${process.env.BACKEND_URL}/scan/report`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json"
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({scanCreditId, reports})
-    })
+        body: JSON.stringify({ scanCreditId, reports })
+    });
     return result.json();
 };
 
 export const startScan = async (oidcToken: string): Promise<startScanDTO> => {
     const result = await fetch(`${process.env.BACKEND_URL}/scan/start`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({oidcToken})
-    })
+        body: JSON.stringify({ oidcToken })
+    });
     return result.json() as Promise<startScanDTO>;
-}
+};
