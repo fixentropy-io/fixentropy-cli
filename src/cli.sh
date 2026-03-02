@@ -17,19 +17,19 @@ executablePath=""
 case "$platform" in
   Darwin)
     if [[ "$architecture" == "x86_64" || "$architecture" == "x64" ]]; then
-      executablePath="$script_dir/dragee-macos-x64"
+      executablePath="$script_dir/fixentropy-macos-x64"
     elif [[ "$architecture" == "arm64" || "$architecture" == "aarch64" ]]; then
-      executablePath="$script_dir/dragee-macos-arm64"
+      executablePath="$script_dir/fixentropy-macos-arm64"
     else
       echo "Could not find a proper executable for your device." >&2
       exit 1
     fi
     ;;
   Linux)
-    executablePath="$script_dir/dragee-linux"
+    executablePath="$script_dir/fixentropy-linux"
     ;;
   MINGW*|MSYS*|CYGWIN*)
-    executablePath="$script_dir/dragee-windows.exe"
+    executablePath="$script_dir/fixentropy-windows.exe"
     ;;
   *)
     echo "Not running on a supported platform."

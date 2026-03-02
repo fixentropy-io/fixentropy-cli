@@ -1,4 +1,4 @@
-import type { Dragee } from '@dragee-io/type/common';
+import type { Dragee } from '@fixentropy-io/type/common';
 
 export const lookupForNamespaces = async (dragees: Dragee[]): Promise<string[]> => {
     console.log('Looking up for namespaces');

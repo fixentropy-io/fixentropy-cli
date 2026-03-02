@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { Dragee } from '@dragee-io/type/common';
+import type { Dragee } from '@fixentropy-io/type/common';
 import { lookupForDragees } from '../src/dragee-lookup.ts';
 
 describe('Should retrive dragees from directory', () => {

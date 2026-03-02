@@ -1,5 +1,5 @@
-import { generateAsserter } from '@dragee-io/asserter-generator';
-import { generateGrapher } from '@dragee-io/grapher-generator';
+import { generateAsserter } from '@fixentropy-io/asserter-generator';
+import { generateGrapher } from '@fixentropy-io/grapher-generator';
 import { Command } from 'commander';
 import { clearRegistryHandler } from './src/commands/clear-registry-command.handler.ts';
 import { drawCommandhandler } from './src/commands/draw-command.handler.ts';
@@ -20,7 +20,7 @@ const report = new Command('report')
     .option(
         '--to --to-dir <path-to-dir>',
         'directory in where to store reports',
-        './dragee/reports'
+        './fixentropy/reports'
     )
     .action(reportCommandhandler);
 
@@ -38,15 +38,15 @@ const draw = new Command('draw')
     .option(
         '--to --to-dir <path-to-dir>',
         'directory in where to store reports',
-        './dragee/reports'
+        './fixentropy/reports'
     )
     .action(drawCommandhandler);
 
 const clearRegistry = new Command('clear-registry')
     .alias('cr')
-    .summary('clears local dragee repository')
+    .summary('clears local fixentropy repository')
     .description(
-        'Clears local dragee repository, erasing all previously downloaded asserters and graphers.'
+        'Clears local fixentropy repository, erasing all previously downloaded asserters and graphers.'
     )
     .action(clearRegistryHandler);
 

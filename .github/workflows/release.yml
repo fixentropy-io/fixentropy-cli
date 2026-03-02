@@ -25,10 +25,10 @@ jobs:
         run: bun run build:release
       - name: Zip binary
         run: |
-          zip dist/dragee-linux.zip dist/dragee-linux
-          zip dist/dragee-macos-arm64.zip dist/dragee-macos-arm64
-          zip dist/dragee-macos-x64.zip dist/dragee-macos-x64
-          zip dist/dragee-windowszip dist/dragee-windows.exe
+          zip dist/fixentropy-linux.zip dist/fixentropy-linux
+          zip dist/fixentropy-macos-arm64.zip dist/fixentropy-macos-arm64
+          zip dist/fixentropy-macos-x64.zip dist/fixentropy-macos-x64
+          zip dist/fixentropy-windowszip dist/fixentropy-windows.exe
 
       - uses: actions/upload-artifact@v4
         with:
@@ -37,10 +37,10 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/dragee-linux.zip
-            dist/dragee-macos-arm64.zip
-            dist/dragee-macos-x64.zip
-            dist/dragee-windows.zip
+            dist/fixentropy-linux.zip
+            dist/fixentropy-macos-arm64.zip
+            dist/fixentropy-macos-x64.zip
+            dist/fixentropy-windows.zip
           draft: false
           prerelease: true
           body: ${{ github.ref }}

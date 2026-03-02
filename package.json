@@ -1,45 +1,43 @@
 {
-  "name": "dragee-cli",
-  "module": "index.ts",
-  "type": "module",
-  "version": "0.0.1",
-  "bin": {
-    "dragee": "./dist/cli.sh"
-  },
-  "scripts": {
-    "exec": "bun run index.ts",
-    "exec-local": "env NODE_ENV='development' env DRAGEE_ASSERTER_LOCAL_REGISTRY_PATH=./test/approval/fake-asserters/ bun exec run --from-dir ./test/approval/sample",
-    "build": "bun build index.ts --target bun --compile --outfile dist/dragee-cli",
-    "build:release": "bun run build:all && cp src/cli.sh dist/cli.sh",
-    "build:all": "bun run build:linux && bun run build:windows && bun run build:macos-intel && bun run build:macos-silicon",
-    "build:linux": "bun build --compile --target=bun-linux-x64 index.ts --outfile dist/dragee-linux",
-    "build:windows": "bun build --compile --target=bun-windows-x64-v1.1.4 index.ts --outfile dist/dragee-windows",
-    "build:macos-intel": "bun build --compile --target=bun-darwin-x64 index.ts --outfile dist/dragee-macos-x64",
-    "build:macos-silicon": "bun build --compile --target=bun-darwin-arm64 index.ts --outfile dist/dragee-macos-arm64",
-    "format": "biome format --write",
-    "lint": "biome lint --write",
-    "check": "biome check --write"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^1.9.0",
-    "@types/bun": "latest",
-    "@types/cli-progress": "^3.11.6",
-    "@types/promptly": "^3.0.5"
-  },
-  "peerDependencies": {
-    "typescript": "^5.5.0"
-  },
-  "dependencies": {
-    "@dragee-io/asserter-generator": "https://github.com/dragee-io/dragee-asserter-generator",
-    "@dragee-io/grapher-generator": "https://github.com/dragee-io/dragee-grapher-generator",
-    "@dragee-io/package-installer": "https://github.com/dragee-io/dragee-package-installer",
-    "@dragee-io/report-generator": "https://github.com/dragee-io/dragee-report-generator",
-    "@dragee-io/type": "0.0.1",
-    "cli-progress": "^3.12.0",
-    "commander": "^12.1.0",
-    "promptly": "^3.2.0"
-  },
-  "trustedDependencies": [
-    "@biomejs/biome"
-  ]
+    "name": "fixentropy-cli",
+    "module": "index.ts",
+    "type": "module",
+    "version": "0.0.1",
+    "bin": {
+        "fixentropy": "./dist/cli.sh"
+    },
+    "scripts": {
+        "exec": "bun run index.ts",
+        "exec-local": "env NODE_ENV='development' env FIXENTROPY_ASSERTER_LOCAL_REGISTRY_PATH=./test/approval/fake-asserters/ bun exec run --from-dir ./test/approval/sample",
+        "build": "bun build index.ts --target bun --compile --outfile dist/fixentropy-cli",
+        "build:release": "bun run build:all && cp src/cli.sh dist/cli.sh",
+        "build:all": "bun run build:linux && bun run build:windows && bun run build:macos-intel && bun run build:macos-silicon",
+        "build:linux": "bun build --compile --target=bun-linux-x64 index.ts --outfile dist/fixentropy-linux",
+        "build:windows": "bun build --compile --target=bun-windows-x64-v1.1.4 index.ts --outfile dist/fixentropy-windows.exe",
+        "build:macos-intel": "bun build --compile --target=bun-darwin-x64 index.ts --outfile dist/fixentropy-macos-x64",
+        "build:macos-silicon": "bun build --compile --target=bun-darwin-arm64 index.ts --outfile dist/fixentropy-macos-arm64",
+        "format": "biome format --write",
+        "lint": "biome lint --write",
+        "check": "biome check --write"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^1.9.0",
+        "@types/bun": "latest",
+        "@types/cli-progress": "^3.11.6",
+        "@types/promptly": "^3.0.5"
+    },
+    "peerDependencies": {
+        "typescript": "^5.5.0"
+    },
+    "dependencies": {
+        "@fixentropy-io/asserter-generator": "https://github.com/fixentropy-io/fixentropy-asserter-generator",
+        "@fixentropy-io/grapher-generator": "https://github.com/fixentropy-io/fixentropy-grapher-generator",
+        "@fixentropy-io/package-installer": "https://github.com/fixentropy-io/fixentropy-package-installer",
+        "@fixentropy-io/report-generator": "https://github.com/fixentropy-io/fixentropy-report-generator",
+        "@fixentropy-io/type": "^0.0.6",
+        "cli-progress": "^3.12.0",
+        "commander": "^12.1.0",
+        "promptly": "^3.2.0"
+    },
+    "trustedDependencies": ["@biomejs/biome"]
 }

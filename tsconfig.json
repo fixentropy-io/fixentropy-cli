@@ -1,5 +1,5 @@
 {
-    "extends": "@dragee-io/type/tsconfig.bun",
+    "extends": "@fixentropy-io/type/tsconfig.bun",
     "compilerOptions": {
         "lib": ["ESNext"],
         "target": "ESNext",
