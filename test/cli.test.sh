@@ -9,7 +9,7 @@ setup() {
   chmod +x "$tmpdir/cli.sh"
 
   # Create dummy executables
-  for exe in dragee-macos-x64 dragee-macos-arm64 dragee-linux dragee-windows.exe; do
+  for exe in fixentropy-macos-x64 fixentropy-macos-arm64 fixentropy-linux fixentropy-windows.exe; do
     echo '#!/usr/bin/env bash' > "$tmpdir/$exe"
     echo "echo \"Executed $exe: \$@\"" >> "$tmpdir/$exe"
     chmod +x "$tmpdir/$exe"
@@ -25,7 +25,7 @@ teardown() {
   run bash "$SCRIPT_DIR/cli.sh" arg1 arg2 arg1 arg2
   # echo "Output: $output"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Executed dragee-macos-x64: arg1 arg2" ]]
+  [[ "$output" =~ "Executed fixentropy-macos-x64: arg1 arg2" ]]
 }
 
 @test "Should execute macOS arm64 binary" {
@@ -33,7 +33,7 @@ teardown() {
   run bash "$SCRIPT_DIR/cli.sh" arg1 arg2 arg1
   # echo "Output: $output"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Executed dragee-macos-arm64: arg1" ]]
+  [[ "$output" =~ "Executed fixentropy-macos-arm64: arg1" ]]
 }
 
 @test "Should execute Linux binary" {
@@ -41,7 +41,7 @@ teardown() {
   run bash "$SCRIPT_DIR/cli.sh" arg1 arg2 --test
   # echo "Output: $output"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Executed dragee-linux: arg1 arg2 --test" ]]
+  [[ "$output" =~ "Executed fixentropy-linux: arg1 arg2 --test" ]]
 }
 
 @test "Should execute Windows binary" {
@@ -49,7 +49,7 @@ teardown() {
   run bash "$SCRIPT_DIR/cli.sh" arg1 arg2 test1 test2
   # echo "Output: $output"
   [ "$status" -eq 0 ]
-  [[ "$output" =~ "Executed dragee-windows.exe: arg1 arg2 test1 test2" ]]
+  [[ "$output" =~ "Executed fixentropy-windows.exe: arg1 arg2 test1 test2" ]]
 }
 
 @test "Should fail if no valid platform is detected" {

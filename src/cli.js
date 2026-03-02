@@ -26,7 +26,7 @@ const launchCli = (executablePath, args) => {
 	const child = spawn(executablePath, args, { stdio: "inherit", env });
 
 	child.on("error", (error) => {
-		console.error(`Error launching Dragée executable: ${error.message}`);
+		console.error(`Error launching fixentropy executable: ${error.message}`);
 	});
 
 	child.on("exit", (code) => {
