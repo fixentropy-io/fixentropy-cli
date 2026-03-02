@@ -1,120 +1,210 @@
-# dragee-cli
+# Fixentropy CLI
 
-## Usage
+> Command-line interface for the Fixentropy ecosystem — analyze your architecture, generate reports, and visualize dependency graphs.
 
-1. Download the appropriate binary from [the release](https://github.com/dragee-io/dragee-cli/releases)
-2. Add the binary to your `$PATH`
+## ✨ Features
 
-### MacOS installation
+| Command              | Alias | Description                                      |
+|----------------------|-------|--------------------------------------------------|
+| `report`             | `r`   | Analyze dragees and build asserter rules reports |
+| `draw`               | `d`   | Generate dependency graphs from graphers         |
+| `clear-registry`     | `cr`  | Clear the local asserters/graphers registry      |
+| `generate-asserter`  | —     | Scaffold a new asserter project                  |
+| `generate-grapher`   | —     | Scaffold a new grapher project                   |
+| `newsletter`         | —     | Subscribe to project updates by email            |
 
-The `dragee` macos binary is unsigned. To use it, [remove the quarantine](https://support.apple.com/en-us/102445) on the file:
+## 📦 Installation
 
-with command line:
+### From release binaries
+
+1. Download the appropriate binary for your platform from the [latest release](https://github.com/fixentropy-io/fixentropy-cli/releases):
+
+   | Platform       | Binary name                 |
+   |----------------|-----------------------------|
+   | Linux (x64)    | `fixentropy-linux`          |
+   | Windows (x64)  | `fixentropy-windows`        |
+   | macOS Intel    | `fixentropy-macos-x64`      |
+   | macOS Silicon  | `fixentropy-macos-arm64`    |
+
+2. Add the binary to your `$PATH`.
+
+### macOS — unsigned binary notice
+
+The macOS binary is unsigned. You need to remove the quarantine attribute before use:
+
 ```bash
-chmod +x ~/Downalods/dragee-mac-os
-xattr -d com.apple.metadata:kMDItemWhereFroms ~/Downalods/dragee-macos-arm64
-xattr -d com.apple.quarantine ~/Downalods/dragee-macos-arm64
+chmod +x ~/Downloads/fixentropy-macos-arm64
+xattr -d com.apple.metadata:kMDItemWhereFroms ~/Downloads/fixentropy-macos-arm64
+xattr -d com.apple.quarantine ~/Downloads/fixentropy-macos-arm64
 ```
 
-from MacOs Security settings (after having launched the binary):
+Alternatively, you can allow the binary from **System Settings → Privacy & Security** after the first launch attempt:
 
-![1741772291168](assets/README/disable-security-on-unsigned-macos-binary.png)
+![Allow unsigned binary from macOS Security settings](assets/README/disable-security-on-unsigned-macos-binary.png)
 
-([Apple documentation](https://support.apple.com/en-us/102445))
-## Development
+See the [Apple documentation](https://support.apple.com/en-us/102445) for more details.
 
-To install dependencies:
+## 🛠️ Development
+
+### Prerequisites
+
+- [Bun](https://bun.sh) ≥ 1.2.5
+
+### Setup
 
 ```bash
+# Install dependencies
 bun install
-```
 
-To set dev environment variables:
-
-```bash
+# Configure environment variables
 cp .env.example .env
 ```
 
-To run:
+### Run locally
 
 ```bash
 bun run index.ts
 ```
 
-## Commands
-
-### report
-
-To generate a dragee result report, based on asserters rules
+### Build
 
 ```bash
-bun run index.ts report --from-dir <path-to-dir> --to-dir <path-to-dir>
+# Build for current platform
+bun run build
+
+# Build for all platforms (linux, windows, macOS Intel & Silicon)
+bun run build:all
 ```
 
-Example
+### Code quality
 
 ```bash
-bun run index.ts report --from-dir ./test/approval/sample/
+# Format, lint, and apply auto-fixes
+bun run check
 ```
 
-### draw
+## 🚀 Usage
 
-To generate a dragee graph, based on graphers
+> All examples below use `bun run index.ts` for development.  
+> In production, replace with the `fixentropy` binary.
+
+### `report` — Generate an architecture rules report
+
+Looks up dragees in the source directory, downloads matching asserters, executes their rules, and outputs the report.
 
 ```bash
-bun run index.ts draw --from-dir <path-to-dir> --to-dir <path-to-dir>
+fixentropy report --from-dir <source> [--to-dir <output>]
 ```
 
-Example
+**Options:**
+
+| Flag                       | Description                       | Default            |
+|----------------------------|-----------------------------------|--------------------|
+| `--from-dir <path>`        | Directory containing dragees      | `.`                |
+| `--to-dir <path>`          | Output directory for reports      | `./dragee/reports` |
+
+**Example:**
 
 ```bash
-bun run index.ts draw --from-dir ./test/approval/sample/ --to-dir ./output
+fixentropy report --from-dir ./test/approval/sample/
 ```
 
-### clear-registry
+---
 
-To clear the local dragee registry (asserters/graphers)
+### `draw` — Generate dependency graphs
+
+Looks up dragees in the source directory, downloads matching graphers, and generates visual dependency graphs.
 
 ```bash
-bun run index.ts clear-registry
+fixentropy draw --from-dir <source> --to-dir <output>
 ```
 
-### generate-asserter
+**Options:**
 
-From [dragee-asserter-generator](https://github.com/dragee-io/dragee-asserter-generator)
-To generate a new dragee asserter
+| Flag                       | Description                       | Default            |
+|----------------------------|-----------------------------------|--------------------|
+| `--from-dir <path>`        | Directory containing dragees      | `.`                |
+| `--to-dir <path>`          | Output directory for graphs       | `./dragee/reports` |
+
+**Example:**
 
 ```bash
-bun run index.ts generate-asserter --name <asserter name> --output-dir <output directory>
+fixentropy draw --from-dir ./test/approval/sample/ --to-dir ./output
 ```
 
-Example
+---
+
+### `clear-registry` — Reset local registry
+
+Clears all previously downloaded asserters and graphers from the local registry (`~/.fixentropy/registry`).
 
 ```bash
-bun run index.ts generate-asserter --name zzz --output-dir E:\Projets\Dragee.io
+fixentropy clear-registry
 ```
 
-### generate-grapher
+---
 
-From [dragee-grapher-generator](https://github.com/dragee-io/dragee-grapher-generator)
-To generate a new dragee grapher
+### `generate-asserter` — Scaffold a new asserter
+
+Generates a new asserter project skeleton.
 
 ```bash
-bun run index.ts generate-grapher --name <grapher name> --output-dir <output directory>
+fixentropy generate-asserter --name <asserter-name> --output-dir <directory>
 ```
 
-Example
+**Example:**
 
 ```bash
-bun run index.ts generate-grapher --name zzz --output-dir E:\Projets\Dragee.io
+fixentropy generate-asserter --name my-asserter --output-dir ./asserters
 ```
 
-### newsletter
+---
 
-To get updates from the project by email
+### `generate-grapher` — Scaffold a new grapher
+
+Generates a new grapher project skeleton.
 
 ```bash
-bun run index.ts newsletter
+fixentropy generate-grapher --name <grapher-name> --output-dir <directory>
 ```
 
-This project was created using `bun init` in bun v1.0.22. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+**Example:**
+
+```bash
+fixentropy generate-grapher --name my-grapher --output-dir ./graphers
+```
+
+---
+
+### `newsletter` — Subscribe to updates
+
+Opt-in to receive email notifications about new features and releases.
+
+```bash
+fixentropy newsletter
+```
+
+## 📁 Project structure
+
+```
+cli/
+├── index.ts              # CLI entry point (Commander.js)
+├── src/
+│   ├── cli.config.ts     # Runtime configuration (~/.fixentropy)
+│   ├── commands/         # Command handlers
+│   ├── dragee-lookup.ts  # Dragee file discovery
+│   └── namespace-lookup.ts
+├── test/                 # Test suite
+├── biome.json            # Linter/formatter config
+└── package.json
+```
+
+## 🔗 Related packages
+
+| Package | Description |
+|---------|-------------|
+| [`@fixentropy-io/type`](https://www.npmjs.com/package/@fixentropy-io/type) | Shared type definitions |
+| [`@fixentropy-io/report-generator`](https://github.com/fixentropy-io/fixentropy-report-generator) | Report generation engine |
+| [`@fixentropy-io/package-installer`](https://github.com/fixentropy-io/fixentropy-package-installer) | Registry package installer |
+| [`@fixentropy-io/asserter-generator`](https://github.com/fixentropy-io/fixentropy-asserter-generator) | Asserter project scaffolding |
+| [`@fixentropy-io/grapher-generator`](https://github.com/fixentropy-io/fixentropy-grapher-generator) | Grapher project scaffolding |

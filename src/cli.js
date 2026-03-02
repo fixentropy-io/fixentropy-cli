@@ -26,7 +26,7 @@ const launchCli = (executablePath, args) => {
 	const child = spawn(executablePath, args, { stdio: "inherit", env });
 
 	child.on("error", (error) => {
-		console.error(`Error launching Dragée executable: ${error.message}`);
+		console.error(`Error launching fixentropy executable: ${error.message}`);
 	});
 
 	child.on("exit", (code) => {
@@ -44,16 +44,16 @@ let executablePath;
 
 if (platform === "darwin") {
 	if (architecture === "x64") {
-		executablePath = resolve(__dirname, "dragee-macos-x64");
+		executablePath = resolve(__dirname, "fixentropy-macos-x64");
 	} else if (architecture === "arm64") {
-		executablePath = resolve(__dirname, "dragee-macos-arm64");
+		executablePath = resolve(__dirname, "fixentropy-macos-arm64");
 	} else {
 		console.error("Could not find a proper executable for your device.");
 	}
 } else if (platform === "linux") {
-	executablePath = resolve(__dirname, "dragee-linux");
+	executablePath = resolve(__dirname, "fixentropy-linux");
 } else if (platform === "win32") {
-	executablePath = resolve(__dirname, "dragee-windows.exe");
+	executablePath = resolve(__dirname, "fixentropy-windows.exe");
 } else {
 	console.log("Not running on a supported platform.");
 }
