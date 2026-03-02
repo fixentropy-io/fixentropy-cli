@@ -22,6 +22,7 @@ const report = new Command('report')
         'directory in where to store reports',
         './fixentropy/reports'
     )
+    .option('--publish', 'publish reports to backend')
     .action(reportCommandhandler);
 
 const draw = new Command('draw')
