@@ -7,7 +7,6 @@ import type { Report } from "@fixentropy-io/type/asserter";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, unlinkSync } from "node:fs";
 import * as newsletterSubscriptionHandler from "../src/commands/newsletter-subscription.handler.ts";
-import * as reportCommanderHandler from "../src/commands/report-command.handler.ts";
 import * as reportCommandhandler from "../src/commands/report-command.handler.ts";
 import { buildReports } from "../src/commands/report-command.handler.ts";
 
@@ -95,11 +94,11 @@ describe("Given a user running the command for the first time", () => {
 		);
 
 		const reportCommanderHandlerMock = spyOn(
-			reportCommanderHandler,
+			reportCommandhandler,
 			"buildReports",
 		).mockImplementation(() => {});
 
-		await reportCommandhandler.reportCommandhandler({ fromDir: "", toDir: "" });
+		await reportCommandhandler.reportCommandhandler({ fromDir: "", toDir: "", publish: false });
 
 		expect(askForEmailMock).toHaveBeenCalledTimes(1);
 
@@ -120,7 +119,7 @@ describe("Given a user not running the command for the first time", () => {
 			"getIfOptinChoiceHasBeenMade",
 		).mockReturnValueOnce(true);
 		const reportCommanderHandlerMock = spyOn(
-			reportCommanderHandler,
+			reportCommandhandler,
 			"buildReports",
 		).mockImplementation(() => {});
 		const askForEmailMock = spyOn(
@@ -128,7 +127,7 @@ describe("Given a user not running the command for the first time", () => {
 			"subscribeToNewsletterHandler",
 		);
 
-		await reportCommandhandler.reportCommandhandler({ fromDir: "", toDir: "" });
+		await reportCommandhandler.reportCommandhandler({ fromDir: "", toDir: "", publish: false });
 		expect(askForEmailMock).not.toHaveBeenCalled();
 
 		getUpdatesByEmailHandlerMock.mockClear();

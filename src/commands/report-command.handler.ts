@@ -1,3 +1,4 @@
+import type { UUID } from 'node:crypto';
 import { lookupForProjects } from '@fixentropy-io/package-installer';
 import {
     HtmlReportBuilder,
@@ -13,6 +14,7 @@ import {
     subscribeToNewsletterHandler
 } from './newsletter-subscription.handler.ts';
 
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 type Options = {
@@ -21,44 +23,56 @@ type Options = {
     publish: boolean;
 };
 
-type StartScanResponse = {
-    scanId: string;
-    token: string;
-    projectId: string;
-    branchName: string;
-    repo: string;
-    commitSha: string | null;
-    expiresAt: string;
+type ScanCreditResponse = {
+    scanCreditId: UUID;
+};
+
+type ScanReportStats = {
+  numberOfAsserterRules: number;
+  numberOfValidatedDependencies: number;
+  numberOfRejectedDependencies: number;
+};
+
+type ScanReportIssue = {
+  ruleName: string;
+  drageeName: string;
+  message: string;
+};
+
+type ScanReport = {
+  namespace: string;
+  issues: ScanReportIssue[];
+  stats: ScanReportStats;
 };
 
 type ProcessScanReportResponse = {
-    scanId: string;
+    scanCreditId: string;
 };
 
 // ── Backend API ────────────────────────────────────────────────────────
 
 const getBackendUrl = (): string | undefined => process.env.BACKEND_URL;
 
-const startScan = async (backendUrl: string, oidcToken: string): Promise<StartScanResponse> => {
-    const response = await fetch(`${backendUrl}/scan/start`, {
+const creditScan = async (backendUrl: string, oidcToken: string): Promise<ScanCreditResponse> => {
+    const response = await fetch(`${backendUrl}/scans/credit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ oidcToken })
     });
 
     if (!response.ok) {
-        throw new Error(`Failed to start scan: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to credit scan: ${response.status} ${response.statusText}`);
     }
 
-    return response.json() as Promise<StartScanResponse>;
+    return response.json() as Promise<ScanCreditResponse>;
 };
 
 const publishReports = async (
     backendUrl: string,
-    scanCreditId: string,
-    reports: Report[]
+    scanCreditId: UUID,
+    reports: ScanReport[]
 ): Promise<ProcessScanReportResponse> => {
-    const response = await fetch(`${backendUrl}/scan/report`, {
+    const response = await fetch(`${backendUrl}/scans/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scanCreditId, reports })
@@ -89,12 +103,25 @@ const tryPublishReports = async (reports: Report[]): Promise<void> => {
 
     try {
         console.log('Starting scan session...');
-        const scan = await startScan(backendUrl, oidcToken);
+        const scan = await creditScan(backendUrl, oidcToken);
 
-        console.log(`Scan started (id: ${scan.scanId}), publishing ${reports.length} report(s)...`);
-        const result = await publishReports(backendUrl, scan.token, reports);
+        console.log(`Scan credited (id: ${scan.scanCreditId}), publishing ${reports.length} report(s)...`);
+        const scanReports: ScanReport[] = reports.map((report): ScanReport => ({
+            namespace: report.namespace,
+            issues: report.errors.map(error => ({
+                ruleName: error.ruleId || '',
+                drageeName: error.drageeName,
+                message: error.message
+            })),
+            stats: {
+                numberOfAsserterRules: report.stats.rulesCount,
+                numberOfValidatedDependencies: report.stats.passCount,
+                numberOfRejectedDependencies: report.stats.errorsCount
+            }
+        }));
+        const result = await publishReports(backendUrl, scan.scanCreditId, scanReports);
 
-        console.log(`Reports published successfully (scan: ${result.scanId})`);
+        console.log(`Reports published successfully (scan: ${result.scanCreditId})`);
     } catch (error) {
         console.error('Failed to publish reports to backend:', error);
     }
