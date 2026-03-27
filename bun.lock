@@ -9,7 +9,7 @@
         "@fixentropy-io/grapher-generator": "https://github.com/fixentropy-io/fixentropy-grapher-generator",
         "@fixentropy-io/package-installer": "https://github.com/fixentropy-io/fixentropy-package-installer",
         "@fixentropy-io/report-generator": "https://github.com/fixentropy-io/fixentropy-report-generator",
-        "@fixentropy-io/type": "0.0.4",
+        "@fixentropy-io/type": "^0.0.6",
         "cli-progress": "^3.12.0",
         "commander": "^12.1.0",
         "promptly": "^3.2.0",
@@ -57,7 +57,7 @@
 
     "@fixentropy-io/report-generator": ["@dragee-io/report-generator@github:fixentropy-io/fixentropy-report-generator#5d34e88", { "dependencies": { "@dragee-io/type": "https://github.com/fixentropy-io/fixentropy-model" }, "peerDependencies": { "typescript": "^5.5.0" } }, "fixentropy-io-fixentropy-report-generator-5d34e88"],
 
-    "@fixentropy-io/type": ["@fixentropy-io/type@0.0.4", "", {}, "sha512-hksWwBwQS8KCeDkv7No7pwW3w4L0sF2ZMj2i8FspzPM0Wnx6CfDKGn2m5FjRcS7hTqnL6gwEWyntGq04OwRucA=="],
+    "@fixentropy-io/type": ["@fixentropy-io/type@0.0.6", "", {}, "sha512-jRIFpdkm6wZLAoG8QrG1YNJuZzm2A8uo3aMNq9vbr4Jwdftfe7OE1JLZCj7HNDzF+nJ7F+QMLg7g7Eykur/ilQ=="],
 
     "@isaacs/fs-minipass": ["@isaacs/fs-minipass@4.0.1", "", { "dependencies": { "minipass": "^7.0.4" } }, "sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w=="],
 
