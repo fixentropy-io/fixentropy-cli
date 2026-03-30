@@ -116,7 +116,7 @@ const tryPublishReports = async (reports: Report[]): Promise<void> => {
         }));
         await publishReports(backendUrl, scan.scanCreditId, scanReports);
 
-        console.log(`Reports published successfully (scan: ${scan.scanCreditId})`);
+        console.log('Reports published successfully');
     } catch (error) {
         console.error('Failed to publish reports to backend:', error);
     }
