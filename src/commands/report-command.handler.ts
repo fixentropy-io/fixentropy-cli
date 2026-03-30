@@ -45,9 +45,6 @@ type ScanReport = {
   stats: ScanReportStats;
 };
 
-type ProcessScanReportResponse = {
-    scanCreditId: string;
-};
 
 // ── Backend API ────────────────────────────────────────────────────────
 
@@ -71,7 +68,7 @@ const publishReports = async (
     backendUrl: string,
     scanCreditId: UUID,
     reports: ScanReport[]
-): Promise<ProcessScanReportResponse> => {
+): Promise<void> => {
     const response = await fetch(`${backendUrl}/scans/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -81,8 +78,6 @@ const publishReports = async (
     if (!response.ok) {
         throw new Error(`Failed to publish reports: ${response.status} ${response.statusText}`);
     }
-
-    return response.json() as Promise<ProcessScanReportResponse>;
 };
 
 // ── Publish orchestration ──────────────────────────────────────────────
@@ -119,9 +114,9 @@ const tryPublishReports = async (reports: Report[]): Promise<void> => {
                 numberOfRejectedDependencies: report.stats.errorsCount
             }
         }));
-        const result = await publishReports(backendUrl, scan.scanCreditId, scanReports);
+        await publishReports(backendUrl, scan.scanCreditId, scanReports);
 
-        console.log(`Reports published successfully (scan: ${result.scanCreditId})`);
+        console.log('Reports published successfully');
     } catch (error) {
         console.error('Failed to publish reports to backend:', error);
     }
