@@ -45,6 +45,23 @@ type ScanReport = {
   stats: ScanReportStats;
 };
 
+type PublishContext = {
+    backendUrl: string;
+    scanCreditId: UUID;
+};
+
+class ScanCreditError extends Error {
+    constructor() {
+        super('Failed to credit the scan');
+    }
+}
+
+class ScanPublishError extends Error {
+    constructor() {
+        super('Failed to publish reports to backend');
+    }
+}
+
 
 // ── Backend API ────────────────────────────────────────────────────────
 
@@ -82,25 +99,34 @@ const publishReports = async (
 
 // ── Publish orchestration ──────────────────────────────────────────────
 
-const tryPublishReports = async (reports: Report[]): Promise<void> => {
+const tryInitializePublish = async (): Promise<PublishContext | null> => {
     const oidcToken = process.env.OIDC_TOKEN;
     const backendUrl = getBackendUrl();
 
     if (!oidcToken) {
         console.warn('--publish: OIDC_TOKEN is not set, skipping backend publish.');
-        return;
+        return null;
     }
 
     if (!backendUrl) {
         console.warn('--publish: BACKEND_URL is not set, skipping backend publish.');
-        return;
+        return null;
     }
 
     try {
         console.log('Starting scan session...');
         const scan = await creditScan(backendUrl, oidcToken);
+        return { backendUrl, scanCreditId: scan.scanCreditId };
+    } catch {
+        throw new ScanCreditError();
+    }
+};
 
-        console.log(`Scan credited (id: ${scan.scanCreditId}), publishing ${reports.length} report(s)...`);
+const tryPublishReports = async (publishContext: PublishContext, reports: Report[]): Promise<void> => {
+    try {
+        console.log(
+            `Scan credited (id: ${publishContext.scanCreditId}), publishing ${reports.length} report(s)...`
+        );
         const scanReports: ScanReport[] = reports.map((report): ScanReport => ({
             namespace: report.namespace,
             issues: report.errors.map(error => ({
@@ -114,11 +140,11 @@ const tryPublishReports = async (reports: Report[]): Promise<void> => {
                 numberOfRejectedDependencies: report.stats.errorsCount
             }
         }));
-        await publishReports(backendUrl, scan.scanCreditId, scanReports);
+        await publishReports(publishContext.backendUrl, publishContext.scanCreditId, scanReports);
 
         console.log('Reports published successfully');
-    } catch (error) {
-        console.error('Failed to publish reports to backend:', error);
+    } catch {
+        throw new ScanPublishError();
     }
 };
 
@@ -133,29 +159,43 @@ export const buildReports = (reports: Report[], filePath: string) => {
 // ── Main handler ───────────────────────────────────────────────────────
 
 export const reportCommandhandler = async ({ fromDir, toDir, publish }: Options) => {
-    const dragees = await lookupForDragees(fromDir);
-    const namespaces = await lookupForNamespaces(dragees);
-    const asserters: Asserter[] = await lookupForProjects(
-        config.projectsRegistryUrl,
-        config.localRegistryPath,
-        namespaces.map(n => `${n}-asserter`)
-    );
+    try {
+        // Fail fast in CI when scan credit is denied to avoid unnecessary local processing.
+        const publishContext = publish ? await tryInitializePublish() : null;
 
-    const reports: Report[] = [];
-    for (const asserter of asserters) {
-        console.log(`Running asserter for namespace ${asserter.namespace}`);
-        reports.push(asserterHandler(asserter, dragees));
+        const dragees = await lookupForDragees(fromDir);
+        const namespaces = await lookupForNamespaces(dragees);
+        const asserters: Asserter[] = await lookupForProjects(
+            config.projectsRegistryUrl,
+            config.localRegistryPath,
+            namespaces.map(n => `${n}-asserter`)
+        );
+
+        const reports: Report[] = [];
+        for (const asserter of asserters) {
+            console.log(`Running asserter for namespace ${asserter.namespace}`);
+            reports.push(asserterHandler(asserter, dragees));
+        }
+
+        // Always generate local reports
+        buildReports(reports, `${toDir}/result`);
+
+        // Optionally publish to backend
+        if (publishContext) {
+            await tryPublishReports(publishContext, reports);
+        }
+
+        askForUpdatesByEmail();
+    } catch (error) {
+        if (error instanceof ScanCreditError || error instanceof ScanPublishError) {
+            console.error(error.message);
+        } else if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error('An unexpected error occurred');
+        }
+        process.exitCode = 1;
     }
-
-    // Always generate local reports
-    buildReports(reports, `${toDir}/result`);
-
-    // Optionally publish to backend
-    if (publish) {
-        await tryPublishReports(reports);
-    }
-
-    askForUpdatesByEmail();
 };
 
 // ── Newsletter ─────────────────────────────────────────────────────────
