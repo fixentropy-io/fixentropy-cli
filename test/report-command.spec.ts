@@ -3,12 +3,15 @@ import {
 	JsonReportBuilder,
 	MarkdownReportBuilder,
 } from "@fixentropy-io/report-generator";
-import type { Report } from "@fixentropy-io/type/asserter";
+import type { Report, ReportStats } from "@fixentropy-io/type/asserter";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { existsSync, unlinkSync } from "node:fs";
 import * as newsletterSubscriptionHandler from "../src/commands/newsletter-subscription.handler.ts";
 import * as reportCommandhandler from "../src/commands/report-command.handler.ts";
-import { buildReports } from "../src/commands/report-command.handler.ts";
+import {
+	buildReports,
+	calculateFailureRate,
+} from "../src/commands/report-command.handler.ts";
 
 const testResultFile = "test/result";
 
@@ -79,6 +82,32 @@ describe("Should display correct reporting format", () => {
 		expect(htmlReportBuilderMock).toBeCalledWith(reports, testResultFile);
 		expect(markdownReportBuilderMock).toBeCalled();
 		expect(markdownReportBuilderMock).toBeCalledWith(reports, testResultFile);
+	});
+});
+
+describe("calculateFailureRate", () => {
+	test("returns the errors over total evaluations across reports", () => {
+		const stats: ReportStats[] = [
+			{ rulesCount: 7, errorsCount: 2, passCount: 5 },
+			{ rulesCount: 5, errorsCount: 1, passCount: 4 },
+		];
+
+		expect(calculateFailureRate(stats)).toBe(3 / 12);
+	});
+
+	test("returns 0 when every evaluation passes", () => {
+		const stats: ReportStats[] = [
+			{ rulesCount: 4, errorsCount: 0, passCount: 4 },
+		];
+
+		expect(calculateFailureRate(stats)).toBe(0);
+	});
+
+	test("returns null when there are no evaluations", () => {
+		expect(calculateFailureRate([])).toBeNull();
+		expect(
+			calculateFailureRate([{ rulesCount: 3, errorsCount: 0, passCount: 0 }]),
+		).toBeNull();
 	});
 });
 
