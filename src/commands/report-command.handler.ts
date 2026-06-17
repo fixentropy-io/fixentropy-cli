@@ -8,6 +8,7 @@ import {
 import {
   type Asserter,
   type Report,
+  type ReportStats,
   asserterHandler,
 } from "@fixentropy-io/type/asserter";
 import { config } from "../cli.config.ts";
@@ -111,10 +112,13 @@ const publishReports = async (
     }),
   );
 
+  const stats = reports.map((report) => report.stats);
+  const failureRate = calculateFailureRate(stats);
+
   const response = await fetch(`${backendUrl}/scans/report`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ scanCreditId, scanReports }),
+    body: JSON.stringify({ scanCreditId, scanReports, failureRate }),
   });
 
   if (!response.ok) {
@@ -122,6 +126,18 @@ const publishReports = async (
   }
 
   console.log("Reports published successfully");
+};
+
+// ── Calculating Failure Rate ──────────────────────────────────────────────────
+
+export const calculateFailureRate = (stats: ReportStats[]): number | null => {
+  const totalCount = stats.reduce(
+    (acc, stat) => acc + stat.errorsCount + stat.passCount,
+    0,
+  );
+  const errorCount = stats.reduce((acc, stat) => acc + stat.errorsCount, 0);
+
+  return totalCount > 0 ? errorCount / totalCount : null;
 };
 
 // ── Report building ────────────────────────────────────────────────────
