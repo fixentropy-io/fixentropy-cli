@@ -113,12 +113,12 @@ const publishReports = async (
   );
 
   const stats = reports.map((report) => report.stats);
-  const failureRate = calculateFailureRate(stats);
+  const score = calculateScore(stats);
 
   const response = await fetch(`${backendUrl}/scans/report`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ scanCreditId, scanReports, failureRate }),
+    body: JSON.stringify({ scanCreditId, scanReports, score }),
   });
 
   if (!response.ok) {
@@ -128,16 +128,16 @@ const publishReports = async (
   console.log("Reports published successfully");
 };
 
-// ── Calculating Failure Rate ──────────────────────────────────────────────────
-
-export const calculateFailureRate = (stats: ReportStats[]): number | null => {
+// ── Calculating Score ──────────────────────────────────────────────────
+// Have to define what are the levels of severity of an error
+export const calculateScore = (stats: ReportStats[]): number | null => {
   const totalCount = stats.reduce(
     (acc, stat) => acc + stat.errorsCount + stat.passCount,
     0,
   );
-  const errorCount = stats.reduce((acc, stat) => acc + stat.errorsCount, 0);
+  const passCount = stats.reduce((acc, stat) => acc + stat.passCount, 0);
 
-  return totalCount > 0 ? errorCount / totalCount : null;
+  return totalCount > 0 ? passCount / totalCount : null;
 };
 
 // ── Report building ────────────────────────────────────────────────────
