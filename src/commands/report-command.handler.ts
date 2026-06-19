@@ -226,8 +226,6 @@ export const reportCommandhandler = async ({
 
     buildReports(reports, `${toDir}/result`);
 
-    console.log(calculatePassRate(reports, buildSeverityByRuleId(asserters)));
-
     // Optionally publish to backend
     if (publish && scanCreditId) {
       console.log(`Publishing ${reports.length} report(s)...`);
