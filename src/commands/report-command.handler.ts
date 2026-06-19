@@ -8,7 +8,7 @@ import {
 import {
   type Asserter,
   type Report,
-  type ReportStats,
+  RuleSeverity,
   asserterHandler,
 } from "@fixentropy-io/type/asserter";
 import { config } from "../cli.config.ts";
@@ -95,6 +95,7 @@ export const publishReports = async (
   backendUrl: string,
   scanCreditId: UUID,
   reports: Report[],
+  severityByRuleId: Map<string, RuleSeverity>,
 ): Promise<void> => {
   const scanReports: ScanReport[] = reports.map(
     (report): ScanReport => ({
@@ -112,8 +113,7 @@ export const publishReports = async (
     }),
   );
 
-  const stats = reports.map((report) => report.stats);
-  const passRate = calculatePassRate(stats);
+  const passRate = calculatePassRate(reports, severityByRuleId);
 
   const response = await fetch(`${backendUrl}/scans/report`, {
     method: "POST",
@@ -129,16 +129,48 @@ export const publishReports = async (
 };
 
 // ── Calculating Pass Rate ──────────────────────────────────────────────
-// TODO(#19): provisional scoring — every evaluation weighs the same.
-// Weight by error severity once severity levels are defined.
-export const calculatePassRate = (stats: ReportStats[]): number | null => {
-  const totalCount = stats.reduce(
-    (acc, stat) => acc + stat.errorsCount + stat.passCount,
+
+const SEVERITY_WEIGHTS: Record<RuleSeverity, number> = {
+  [RuleSeverity.INFO]: 1,
+  [RuleSeverity.WARN]: 5,
+  [RuleSeverity.ERROR]: 20,
+};
+
+export const buildSeverityByRuleId = (
+  asserters: Asserter[],
+): Map<string, RuleSeverity> =>
+  new Map(
+    asserters.flatMap((asserter) =>
+      asserter.rules.map((rule) => [rule.id, rule.severity] as const),
+    ),
+  );
+
+export const calculatePassRate = (
+  reports: Report[],
+  severityByRuleId: Map<string, RuleSeverity>,
+): number | null => {
+  const totalEvaluations = reports.reduce(
+    (acc, report) => acc + report.stats.passCount + report.stats.errorsCount,
     0,
   );
-  const passCount = stats.reduce((acc, stat) => acc + stat.passCount, 0);
+  if (totalEvaluations === 0) {
+    return null;
+  }
 
-  return totalCount > 0 ? passCount / totalCount : null;
+  const passCount = reports.reduce(
+    (acc, report) => acc + report.stats.passCount,
+    0,
+  );
+  const weightedFailureCount = reports.reduce(
+    (acc, report) =>
+      acc +
+      report.errors.reduce((sum, error) => {
+        const severity = severityByRuleId.get(error.ruleId ?? "");
+        return sum + (severity ? SEVERITY_WEIGHTS[severity] : 0);
+      }, 0),
+    0,
+  );
+  return passCount / (passCount + weightedFailureCount);
 };
 
 // ── Report building ────────────────────────────────────────────────────
@@ -194,10 +226,17 @@ export const reportCommandhandler = async ({
 
     buildReports(reports, `${toDir}/result`);
 
+    console.log(calculatePassRate(reports, buildSeverityByRuleId(asserters)));
+
     // Optionally publish to backend
     if (publish && scanCreditId) {
       console.log(`Publishing ${reports.length} report(s)...`);
-      await publishReports(backendUrl ?? "", scanCreditId, reports);
+      await publishReports(
+        backendUrl ?? "",
+        scanCreditId,
+        reports,
+        buildSeverityByRuleId(asserters),
+      );
     }
 
     askForUpdatesByEmail();

@@ -3,7 +3,7 @@ import {
 	JsonReportBuilder,
 	MarkdownReportBuilder,
 } from "@fixentropy-io/report-generator";
-import type { Report, ReportStats } from "@fixentropy-io/type/asserter";
+import { type Report, RuleSeverity } from "@fixentropy-io/type/asserter";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
 import { randomUUID } from "node:crypto";
 import { existsSync, unlinkSync } from "node:fs";
@@ -88,46 +88,93 @@ describe("Should display correct reporting format", () => {
 });
 
 describe("calculatePassRate", () => {
-	test("returns the passes over total evaluations across reports", () => {
-		const stats: ReportStats[] = [
-			{ rulesCount: 7, errorsCount: 2, passCount: 5 },
-			{ rulesCount: 5, errorsCount: 1, passCount: 4 },
+	const severityByRuleId = new Map<string, RuleSeverity>([
+		["rule-error", RuleSeverity.ERROR],
+		["rule-warn", RuleSeverity.WARN],
+		["rule-info", RuleSeverity.INFO],
+	]);
+
+	const reportWith = (
+		errors: Report["errors"],
+		passCount: number,
+	): Report => ({
+		namespace: "ns",
+		pass: errors.length === 0,
+		errors,
+		stats: {
+			rulesCount: passCount + errors.length,
+			errorsCount: errors.length,
+			passCount,
+		},
+	});
+
+	test("weights each failure by its rule severity", () => {
+		// 5 passes, one error-severity failure (weight 20) => 5 / (5 + 20)
+		const reports: Report[] = [
+			reportWith(
+				[{ drageeName: "D", message: "m", ruleId: "rule-error" }],
+				5,
+			),
 		];
 
-		expect(calculatePassRate(stats)).toBe(9 / 12);
+		expect(calculatePassRate(reports, severityByRuleId)).toBe(5 / 25);
+	});
+
+	test("mixes severities across reports", () => {
+		// passes: 5 + 4 = 9; failures: error(20) + warn(5) + info(1) = 26
+		const reports: Report[] = [
+			reportWith(
+				[
+					{ drageeName: "A", message: "m", ruleId: "rule-error" },
+					{ drageeName: "B", message: "m", ruleId: "rule-warn" },
+				],
+				5,
+			),
+			reportWith(
+				[{ drageeName: "C", message: "m", ruleId: "rule-info" }],
+				4,
+			),
+		];
+
+		expect(calculatePassRate(reports, severityByRuleId)).toBe(9 / 35);
 	});
 
 	test("returns 1 when every evaluation passes", () => {
-		const stats: ReportStats[] = [
-			{ rulesCount: 4, errorsCount: 0, passCount: 4 },
-		];
-
-		expect(calculatePassRate(stats)).toBe(1);
+		expect(calculatePassRate([reportWith([], 4)], severityByRuleId)).toBe(1);
 	});
 
 	test("returns 0 when every evaluation fails", () => {
-		const stats: ReportStats[] = [
-			{ rulesCount: 4, errorsCount: 4, passCount: 0 },
+		const reports: Report[] = [
+			reportWith(
+				[
+					{ drageeName: "A", message: "m", ruleId: "rule-error" },
+					{ drageeName: "B", message: "m", ruleId: "rule-error" },
+				],
+				0,
+			),
 		];
 
-		expect(calculatePassRate(stats)).toBe(0);
+		expect(calculatePassRate(reports, severityByRuleId)).toBe(0);
 	});
 
 	test("returns null when there are no evaluations", () => {
-		expect(calculatePassRate([])).toBeNull();
-		expect(
-			calculatePassRate([{ rulesCount: 3, errorsCount: 0, passCount: 0 }]),
-		).toBeNull();
+		expect(calculatePassRate([], severityByRuleId)).toBeNull();
+		expect(calculatePassRate([reportWith([], 0)], severityByRuleId)).toBeNull();
 	});
 });
 
 describe("publishReports", () => {
+	const severityByRuleId = new Map<string, RuleSeverity>([
+		["rule-a", RuleSeverity.ERROR],
+		["rule-b", RuleSeverity.WARN],
+	]);
+
 	const reports: Report[] = [
 		{
 			errors: [{ drageeName: "DrageeOne", message: "boom", ruleId: "rule-a" }],
 			namespace: "ddd",
 			pass: false,
-			stats: { rulesCount: 7, errorsCount: 2, passCount: 5 },
+			stats: { rulesCount: 6, errorsCount: 1, passCount: 5 },
 		},
 		{
 			errors: [{ drageeName: "DrageeTwo", message: "boom", ruleId: "rule-b" }],
@@ -142,14 +189,20 @@ describe("publishReports", () => {
 			new Response(null, { status: 200 }),
 		);
 
-		await publishReports("https://backend.test", randomUUID(), reports);
+		await publishReports(
+			"https://backend.test",
+			randomUUID(),
+			reports,
+			severityByRuleId,
+		);
 
 		expect(fetchMock).toHaveBeenCalledTimes(1);
 		const [url, options] = fetchMock.mock.calls[0];
 		expect(url).toBe("https://backend.test/scans/report");
 
 		const body = JSON.parse(options?.body as string);
-		expect(body.score).toBe(9 / 12);
+		// passes 9; weighted failures error(20) + warn(5) = 25
+		expect(body.score).toBe(9 / 34);
 
 		fetchMock.mockRestore();
 	});
@@ -159,14 +212,19 @@ describe("publishReports", () => {
 			new Response(null, { status: 200 }),
 		);
 
-		await publishReports("https://backend.test", randomUUID(), [
-			{
-				errors: [],
-				namespace: "empty",
-				pass: true,
-				stats: { rulesCount: 0, errorsCount: 0, passCount: 0 },
-			},
-		]);
+		await publishReports(
+			"https://backend.test",
+			randomUUID(),
+			[
+				{
+					errors: [],
+					namespace: "empty",
+					pass: true,
+					stats: { rulesCount: 0, errorsCount: 0, passCount: 0 },
+				},
+			],
+			severityByRuleId,
+		);
 
 		const [, options] = fetchMock.mock.calls[0];
 		const body = JSON.parse(options?.body as string);
