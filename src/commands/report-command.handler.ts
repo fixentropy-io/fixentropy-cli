@@ -91,7 +91,7 @@ const creditScan = async (
   return scanCreditId;
 };
 
-const publishReports = async (
+export const publishReports = async (
   backendUrl: string,
   scanCreditId: UUID,
   reports: Report[],

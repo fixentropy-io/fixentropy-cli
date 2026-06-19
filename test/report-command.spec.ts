@@ -5,12 +5,14 @@ import {
 } from "@fixentropy-io/report-generator";
 import type { Report, ReportStats } from "@fixentropy-io/type/asserter";
 import { afterEach, beforeEach, describe, expect, spyOn, test } from "bun:test";
+import { randomUUID } from "node:crypto";
 import { existsSync, unlinkSync } from "node:fs";
 import * as newsletterSubscriptionHandler from "../src/commands/newsletter-subscription.handler.ts";
 import * as reportCommandhandler from "../src/commands/report-command.handler.ts";
 import {
 	buildReports,
 	calculatePassRate,
+	publishReports,
 } from "../src/commands/report-command.handler.ts";
 
 const testResultFile = "test/result";
@@ -116,6 +118,61 @@ describe("calculatePassRate", () => {
 		expect(
 			calculatePassRate([{ rulesCount: 3, errorsCount: 0, passCount: 0 }]),
 		).toBeNull();
+	});
+});
+
+describe("publishReports", () => {
+	const reports: Report[] = [
+		{
+			errors: [{ drageeName: "DrageeOne", message: "boom", ruleId: "rule-a" }],
+			namespace: "ddd",
+			pass: false,
+			stats: { rulesCount: 7, errorsCount: 2, passCount: 5 },
+		},
+		{
+			errors: [{ drageeName: "DrageeTwo", message: "boom", ruleId: "rule-b" }],
+			namespace: "test",
+			pass: false,
+			stats: { rulesCount: 5, errorsCount: 1, passCount: 4 },
+		},
+	];
+
+	test("sends the pass rate under the score key in the request body", async () => {
+		const fetchMock = spyOn(globalThis, "fetch").mockResolvedValue(
+			new Response(null, { status: 200 }),
+		);
+
+		await publishReports("https://backend.test", randomUUID(), reports);
+
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		const [url, options] = fetchMock.mock.calls[0];
+		expect(url).toBe("https://backend.test/scans/report");
+
+		const body = JSON.parse(options?.body as string);
+		expect(body.score).toBe(9 / 12);
+
+		fetchMock.mockRestore();
+	});
+
+	test("sends score as null when there are no evaluations", async () => {
+		const fetchMock = spyOn(globalThis, "fetch").mockResolvedValue(
+			new Response(null, { status: 200 }),
+		);
+
+		await publishReports("https://backend.test", randomUUID(), [
+			{
+				errors: [],
+				namespace: "empty",
+				pass: true,
+				stats: { rulesCount: 0, errorsCount: 0, passCount: 0 },
+			},
+		]);
+
+		const [, options] = fetchMock.mock.calls[0];
+		const body = JSON.parse(options?.body as string);
+		expect(body.score).toBeNull();
+
+		fetchMock.mockRestore();
 	});
 });
 
