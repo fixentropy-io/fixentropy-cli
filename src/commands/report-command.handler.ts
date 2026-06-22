@@ -8,6 +8,7 @@ import {
 import {
   type Asserter,
   type Report,
+  RuleSeverity,
   asserterHandler,
 } from "@fixentropy-io/type/asserter";
 import { config } from "../cli.config.ts";
@@ -90,10 +91,11 @@ const creditScan = async (
   return scanCreditId;
 };
 
-const publishReports = async (
+export const publishReports = async (
   backendUrl: string,
   scanCreditId: UUID,
   reports: Report[],
+  severityByRuleId: Map<string, RuleSeverity>,
 ): Promise<void> => {
   const scanReports: ScanReport[] = reports.map(
     (report): ScanReport => ({
@@ -111,10 +113,12 @@ const publishReports = async (
     }),
   );
 
+  const passRate = calculatePassRate(reports, severityByRuleId);
+
   const response = await fetch(`${backendUrl}/scans/report`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ scanCreditId, scanReports }),
+    body: JSON.stringify({ scanCreditId, scanReports, score: passRate }),
   });
 
   if (!response.ok) {
@@ -122,6 +126,53 @@ const publishReports = async (
   }
 
   console.log("Reports published successfully");
+};
+
+// ── Calculating Pass Rate ──────────────────────────────────────────────
+
+// TODO: Enable differentiated weights once rules with varying severities exist
+const SEVERITY_WEIGHTS: Record<RuleSeverity, number> = {
+  [RuleSeverity.INFO]: 1,
+  [RuleSeverity.WARN]: 1,
+  [RuleSeverity.ERROR]: 1,
+};
+
+export const buildSeverityByRuleId = (
+  asserters: Asserter[],
+): Map<string, RuleSeverity> =>
+  new Map(
+    asserters.flatMap((asserter) =>
+      asserter.rules.map((rule) => [rule.id, rule.severity] as const),
+    ),
+  );
+
+export const calculatePassRate = (
+  reports: Report[],
+  severityByRuleId: Map<string, RuleSeverity>,
+): number | null => {
+  const passCount = reports.reduce(
+    (acc, report) => acc + report.stats.passCount,
+    0,
+  );
+  const failureCount = reports.reduce(
+    (acc, report) => acc + report.errors.length,
+    0,
+  );
+  if (passCount + failureCount === 0) {
+    return null;
+  }
+
+  const weightedFailureCount = reports.reduce(
+    (acc, report) =>
+      acc +
+      report.errors.reduce((sum, error) => {
+        const severity =
+          severityByRuleId.get(error.ruleId ?? "") ?? RuleSeverity.ERROR;
+        return sum + SEVERITY_WEIGHTS[severity];
+      }, 0),
+    0,
+  );
+  return passCount / (passCount + weightedFailureCount);
 };
 
 // ── Report building ────────────────────────────────────────────────────
@@ -180,7 +231,12 @@ export const reportCommandhandler = async ({
     // Optionally publish to backend
     if (publish && scanCreditId) {
       console.log(`Publishing ${reports.length} report(s)...`);
-      await publishReports(backendUrl ?? "", scanCreditId, reports);
+      await publishReports(
+        backendUrl ?? "",
+        scanCreditId,
+        reports,
+        buildSeverityByRuleId(asserters),
+      );
     }
 
     askForUpdatesByEmail();
