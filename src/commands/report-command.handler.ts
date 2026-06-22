@@ -130,10 +130,11 @@ export const publishReports = async (
 
 // ── Calculating Pass Rate ──────────────────────────────────────────────
 
+// TODO: Define rules with different severities so we can test calculating the score with different weights
 const SEVERITY_WEIGHTS: Record<RuleSeverity, number> = {
   [RuleSeverity.INFO]: 1,
-  [RuleSeverity.WARN]: 5,
-  [RuleSeverity.ERROR]: 20,
+  [RuleSeverity.WARN]: 1,
+  [RuleSeverity.ERROR]: 1,
 };
 
 export const buildSeverityByRuleId = (
