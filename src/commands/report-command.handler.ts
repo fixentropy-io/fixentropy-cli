@@ -130,7 +130,7 @@ export const publishReports = async (
 
 // ── Calculating Pass Rate ──────────────────────────────────────────────
 
-// TODO: Define rules with different severities so we can test calculating the score with different weights
+// TODO: Enable differentiated weights once rules with varying severities exist
 const SEVERITY_WEIGHTS: Record<RuleSeverity, number> = {
   [RuleSeverity.INFO]: 1,
   [RuleSeverity.WARN]: 1,
