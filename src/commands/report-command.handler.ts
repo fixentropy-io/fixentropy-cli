@@ -150,24 +150,25 @@ export const calculatePassRate = (
   reports: Report[],
   severityByRuleId: Map<string, RuleSeverity>,
 ): number | null => {
-  const totalEvaluations = reports.reduce(
-    (acc, report) => acc + report.stats.passCount + report.stats.errorsCount,
-    0,
-  );
-  if (totalEvaluations === 0) {
-    return null;
-  }
-
   const passCount = reports.reduce(
     (acc, report) => acc + report.stats.passCount,
     0,
   );
+  const failureCount = reports.reduce(
+    (acc, report) => acc + report.errors.length,
+    0,
+  );
+  if (passCount + failureCount === 0) {
+    return null;
+  }
+
   const weightedFailureCount = reports.reduce(
     (acc, report) =>
       acc +
       report.errors.reduce((sum, error) => {
-        const severity = severityByRuleId.get(error.ruleId ?? "");
-        return sum + (severity ? SEVERITY_WEIGHTS[severity] : 0);
+        const severity =
+          severityByRuleId.get(error.ruleId ?? "") ?? RuleSeverity.ERROR;
+        return sum + SEVERITY_WEIGHTS[severity];
       }, 0),
     0,
   );

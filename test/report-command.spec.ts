@@ -108,8 +108,8 @@ describe("calculatePassRate", () => {
 		},
 	});
 
-	test("weights each failure by its rule severity", () => {
-		// 5 passes, one error-severity failure (weight 20) => 5 / (5 + 20)
+	test("counts each failure with a uniform weight", () => {
+		// 5 passes, one failure (weight 1) => 5 / (5 + 1)
 		const reports: Report[] = [
 			reportWith(
 				[{ drageeName: "D", message: "m", ruleId: "rule-error" }],
@@ -117,11 +117,11 @@ describe("calculatePassRate", () => {
 			),
 		];
 
-		expect(calculatePassRate(reports, severityByRuleId)).toBe(5 / 25);
+		expect(calculatePassRate(reports, severityByRuleId)).toBe(5 / 6);
 	});
 
-	test("mixes severities across reports", () => {
-		// passes: 5 + 4 = 9; failures: error(20) + warn(5) + info(1) = 26
+	test("sums failures across reports", () => {
+		// passes: 5 + 4 = 9; failures: 3 (each weight 1) => 9 / 12
 		const reports: Report[] = [
 			reportWith(
 				[
@@ -136,7 +136,16 @@ describe("calculatePassRate", () => {
 			),
 		];
 
-		expect(calculatePassRate(reports, severityByRuleId)).toBe(9 / 35);
+		expect(calculatePassRate(reports, severityByRuleId)).toBe(9 / 12);
+	});
+
+	test("counts failures with an unknown rule id instead of dropping them", () => {
+		// 5 passes, one failure whose ruleId is absent from the map (weight 1)
+		const reports: Report[] = [
+			reportWith([{ drageeName: "D", message: "m", ruleId: "unknown" }], 5),
+		];
+
+		expect(calculatePassRate(reports, severityByRuleId)).toBe(5 / 6);
 	});
 
 	test("returns 1 when every evaluation passes", () => {
@@ -184,11 +193,19 @@ describe("publishReports", () => {
 		},
 	];
 
-	test("sends the pass rate under the score key in the request body", async () => {
-		const fetchMock = spyOn(globalThis, "fetch").mockResolvedValue(
+	let fetchMock: ReturnType<typeof spyOn<typeof globalThis, "fetch">>;
+
+	beforeEach(() => {
+		fetchMock = spyOn(globalThis, "fetch").mockResolvedValue(
 			new Response(null, { status: 200 }),
 		);
+	});
 
+	afterEach(() => {
+		fetchMock.mockRestore();
+	});
+
+	test("sends the pass rate under the score key in the request body", async () => {
 		await publishReports(
 			"https://backend.test",
 			randomUUID(),
@@ -201,17 +218,11 @@ describe("publishReports", () => {
 		expect(url).toBe("https://backend.test/scans/report");
 
 		const body = JSON.parse(options?.body as string);
-		// passes 9; weighted failures error(20) + warn(5) = 25
-		expect(body.score).toBe(9 / 34);
-
-		fetchMock.mockRestore();
+		// passes 9; failures rule-a + rule-b (each weight 1) = 2
+		expect(body.score).toBe(9 / 11);
 	});
 
 	test("sends score as null when there are no evaluations", async () => {
-		const fetchMock = spyOn(globalThis, "fetch").mockResolvedValue(
-			new Response(null, { status: 200 }),
-		);
-
 		await publishReports(
 			"https://backend.test",
 			randomUUID(),
@@ -229,8 +240,6 @@ describe("publishReports", () => {
 		const [, options] = fetchMock.mock.calls[0];
 		const body = JSON.parse(options?.body as string);
 		expect(body.score).toBeNull();
-
-		fetchMock.mockRestore();
 	});
 });
 
