@@ -118,7 +118,7 @@ export const publishReports = async (
   const response = await fetch(`${backendUrl}/scans/report`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ scanCreditId, scanReports, score: passRate }),
+    body: JSON.stringify({ scanCreditId, reports: scanReports, score: passRate }),
   });
 
   if (!response.ok) {
