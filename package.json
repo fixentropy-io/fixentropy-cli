@@ -18,13 +18,15 @@
 		"build:macos-silicon": "bun build --compile --target=bun-darwin-arm64 index.ts --outfile dist/fixentropy-macos-arm64",
 		"format": "biome format --write",
 		"lint": "biome lint --write",
-		"check": "biome check --write"
+		"check": "biome check --write",
+		"release:dry": "semantic-release --dry-run --no-ci"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.0",
 		"@types/bun": "latest",
 		"@types/cli-progress": "^3.11.6",
-		"@types/promptly": "^3.0.5"
+		"@types/promptly": "^3.0.5",
+		"semantic-release": "^24.2.3"
 	},
 	"peerDependencies": {
 		"typescript": "^5.5.0"
