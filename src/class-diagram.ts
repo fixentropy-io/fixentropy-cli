@@ -3,12 +3,12 @@ import type { Dragee } from '@fixentropy-io/type/common';
 import type { Grapher } from '@fixentropy-io/type/grapher';
 import { config } from './cli.config.ts';
 
-export const generateClassDiagram = async (dragees: Dragee[]): Promise<string | undefined> => {
+export const generateClassDiagram = async (dragees: Dragee[]): Promise<string | null> => {
     const graphers: Grapher[] = await lookupForProjects(
         config.projectsRegistryUrl,
         config.localRegistryPath,
         ['ddd-grapher']
     );
 
-    return graphers[0].graphs.find(graph => graph.id.endsWith('/class-diagram'))?.handler(dragees);
+    return graphers[0].graphs.find(graph => graph.id.endsWith('/class-diagram'))?.handler(dragees) ?? null;
 };

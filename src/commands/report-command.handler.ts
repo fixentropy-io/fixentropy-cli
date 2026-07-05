@@ -97,7 +97,7 @@ export const publishReports = async (
   scanCreditId: UUID,
   reports: Report[],
   severityByRuleId: Map<string, RuleSeverity>,
-  classDiagram: string | undefined,
+  classDiagram: string | null,
 ): Promise<void> => {
   const scanReports: ScanReport[] = reports.map(
     (report): ScanReport => ({

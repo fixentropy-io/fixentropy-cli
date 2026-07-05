@@ -211,7 +211,7 @@ describe("publishReports", () => {
 			randomUUID(),
 			reports,
 			severityByRuleId,
-			undefined,
+			null,
 		);
 
 		expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -236,7 +236,7 @@ describe("publishReports", () => {
 				},
 			],
 			severityByRuleId,
-			undefined,
+			null,
 		);
 
 		const [, options] = fetchMock.mock.calls[0];
