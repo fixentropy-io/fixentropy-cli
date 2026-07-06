@@ -243,6 +243,36 @@ describe("publishReports", () => {
 		const body = JSON.parse(options?.body as string);
 		expect(body.score).toBeNull();
 	});
+
+	test("sends the class diagram under the classDiagram key in the request body", async () => {
+		const classDiagram = "classDiagram\n  class DrageeOne";
+
+		await publishReports(
+			"https://backend.test",
+			randomUUID(),
+			reports,
+			severityByRuleId,
+			classDiagram,
+		);
+
+		const [, options] = fetchMock.mock.calls[0];
+		const body = JSON.parse(options?.body as string);
+		expect(body.classDiagram).toBe(classDiagram);
+	});
+
+	test("sends classDiagram as null when no diagram is provided", async () => {
+		await publishReports(
+			"https://backend.test",
+			randomUUID(),
+			reports,
+			severityByRuleId,
+			null,
+		);
+
+		const [, options] = fetchMock.mock.calls[0];
+		const body = JSON.parse(options?.body as string);
+		expect(body.classDiagram).toBeNull();
+	});
 });
 
 describe("Given a user running the command for the first time", () => {
