@@ -11,6 +11,7 @@ import {
   RuleSeverity,
   asserterHandler,
 } from "@fixentropy-io/type/asserter";
+import { generateClassDiagram } from "../class-diagram.ts";
 import { config } from "../cli.config.ts";
 import { lookupForDragees } from "../dragee-lookup.ts";
 import { lookupForNamespaces } from "../namespace-lookup.ts";
@@ -96,6 +97,7 @@ export const publishReports = async (
   scanCreditId: UUID,
   reports: Report[],
   severityByRuleId: Map<string, RuleSeverity>,
+  classDiagram: string | null,
 ): Promise<void> => {
   const scanReports: ScanReport[] = reports.map(
     (report): ScanReport => ({
@@ -118,7 +120,7 @@ export const publishReports = async (
   const response = await fetch(`${backendUrl}/scans/report`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ scanCreditId, reports: scanReports, score: passRate }),
+    body: JSON.stringify({ scanCreditId, reports: scanReports, score: passRate, classDiagram }),
   });
 
   if (!response.ok) {
@@ -231,11 +233,13 @@ export const reportCommandhandler = async ({
     // Optionally publish to backend
     if (publish && scanCreditId) {
       console.log(`Publishing ${reports.length} report(s)...`);
+      const classDiagram = await generateClassDiagram(dragees);
       await publishReports(
         backendUrl ?? "",
         scanCreditId,
         reports,
         buildSeverityByRuleId(asserters),
+        classDiagram,
       );
     }
 
