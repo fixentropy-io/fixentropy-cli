@@ -7,8 +7,10 @@ export const generateClassDiagram = async (
   dragees: Dragee[],
 ): Promise<string | null> => {
   try {
+    // TEMP: ddd-grapher is not yet published under @fixentropy-io; pull it from
+    // the deprecated @dragee-io scope until it is republished.
     const graphers: Grapher[] = await lookupForProjects(
-      config.projectsRegistryUrl,
+      "https://registry.npmjs.org/@dragee-io",
       config.localRegistryPath,
       ["ddd-grapher"],
     );
